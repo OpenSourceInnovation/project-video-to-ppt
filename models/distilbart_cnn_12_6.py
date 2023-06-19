@@ -4,7 +4,7 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 # loading the model outside of the function makes it faster
 SUMMARIZATION_MODEL = "sshleifer/distilbart-cnn-12-6"
 tokenizer   = AutoTokenizer.from_pretrained(SUMMARIZATION_MODEL)
-model       = AutoModelForSeq2SeqLM.from_pretrained(SUMMARIZATION_MODEL)
+model       = AutoModelForSeq2SeqLM.from_pretrained(SUMMARIZATION_MODEL, device_map="cuda:0")
 
 def summarize(text, max_len=20):
     """
@@ -24,6 +24,10 @@ def summarize(text, max_len=20):
                        truncation=True,
     ).input_ids
     
+    # Move the inputs tensor to the same device as the model tensor
+    print(model.device)
+    inputs = inputs.cuda()
+    
     outputs = model.generate(inputs, 
                             max_new_tokens=100, 
                             num_beams=8, 
@@ -31,4 +35,3 @@ def summarize(text, max_len=20):
                             early_stopping=False
     )
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
-
