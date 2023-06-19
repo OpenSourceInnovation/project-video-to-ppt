@@ -2,3 +2,6 @@
 proj
 .vscode
 **.deb
+subs.txt
+summary.md
+*.pptx
