@@ -13,7 +13,7 @@ def getSubsText(video_id="", getGenerated=False):
     
     return (TextFormatter().format_transcript(data)).replace("\n", " ")
 
-# write subs to file
-subs = getSubsText("CrNcnkAtL2I")
-with open("subs.txt", "w") as f:
-    f.write(subs)
+# # write subs to file
+# subs = getSubsText("CrNcnkAtL2I")
+# with open("subs.txt", "w") as f:
+#     f.write(subs)
