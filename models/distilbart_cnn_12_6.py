@@ -25,7 +25,6 @@ def summarize(text, max_len=20):
     ).input_ids
     
     # Move the inputs tensor to the same device as the model tensor
-    print(model.device)
     inputs = inputs.cuda()
     
     outputs = model.generate(inputs, 
