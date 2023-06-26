@@ -18,7 +18,7 @@ md.header()
 if __name__ == "__main__":
     optparser = optparse.OptionParser()
     optparser.add_option("-v", "--video", dest="video_id", help="YouTube video ID")
-    optparser.add_option("--chunk-size", dest="chunk_size")
+    optparser.add_option("--chunk-size", dest="chunk_size", type="int")
     optparser.add_option( "-o", "--out", dest="out_ppt_name")
     
     (opts, _) = optparser.parse_args()
