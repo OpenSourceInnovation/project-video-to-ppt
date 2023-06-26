@@ -43,9 +43,7 @@ chunk_num = 1
 for chunk in chunks:
     print(f"processing Chunk: {chunk_num}/{chunk_len}")
     summary = summarize(chunk)
-    print("\t summary done..")
     title = generate_title(summary)
-    print("\t title done..")
     md.addpage(title, summary)
     chunk_num += 1
     continue
