@@ -7,7 +7,7 @@ def generate_ppt(markdown_source, output_name, chromium_path="./chrome_sandbox")
     
     # if user is root, then set CHROMIUM_PATH to chromium_path
     if os.getuid() == 0:
-        os.environ["CHROMIUM_PATH"] = chromium_path
+        os.environ["CHROME_PATH"] = chromium_path
     
     # check for markdown source
     if not os.path.exists(markdown_source):
