@@ -33,9 +33,10 @@ if __name__ == "__main__":
 print("Getting subtitles...")
 video_subs = getSubsText(VIDEO_ID)
 
-chunker_init = LangChainChunker(video_subs)
-chunks = chunker_init.chunker(size=CHUNK_SIZE)
-chunk_len = len(chunks)
+chunker_init    = LangChainChunker(video_subs)
+chunks          = chunker_init.chunker(size=CHUNK_SIZE)
+chunk_len       = len(chunks)
+
 print(f"subtitles divided to {chunk_len} chunks")
 
 chunk_num = 1
