@@ -30,7 +30,7 @@ if __name__ == "__main__":
         VIDEO_ID = opts.video_id
     
     if opts.chunk_size is not None:
-        CHUNK_SIZE = opts.chunks_size
+        CHUNK_SIZE = int(opts.chunk_size)
     
     if opts.out_ppt_name is not None:
         OUT_PPT_NAME = optparse.out_ppt_name
