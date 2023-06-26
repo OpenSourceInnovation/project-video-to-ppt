@@ -35,3 +35,14 @@ def summarize(text, max_len=20):
                             early_stopping=False
     )
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+def summarizePipeline(text):
+    from transformers import pipeline
+    
+    pipe = pipeline(
+        "summarization",
+        model=model,
+        tokenizer=tokenizer,
+    )
+    
+    return pipe(text)[0]["summary_text"]
