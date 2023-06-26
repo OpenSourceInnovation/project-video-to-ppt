@@ -38,4 +38,6 @@ class marp:
         self.marp_write(md.h1(title))
         self.marp_write(body)
         self.marp_write("\n\n---\n\n")
-
+    
+    def close_file(self):
+        self.f.close()

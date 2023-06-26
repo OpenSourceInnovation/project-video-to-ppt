@@ -55,4 +55,5 @@ for chunk in chunks:
     continue
 
 print(f"Generating {OUT_PPT_NAME}..")
+md.close_file()
 generate_ppt("summary.md", OUT_PPT_NAME)
