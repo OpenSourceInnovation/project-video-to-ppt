@@ -19,8 +19,8 @@ def t5model(prompt: str) -> str:
         **inputs,
         num_beams=8,
         do_sample=True,
-        min_length=10,
-        max_length=25
+        min_length=8,
+        max_length=15
     )
     
     decoded_output = tokenizer.batch_decode(
