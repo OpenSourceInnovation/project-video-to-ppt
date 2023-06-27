@@ -2,7 +2,7 @@ import optparse, copy
 from subtitles import getSubsText
 from models.distilbart_cnn_12_6 import summarize
 from models.t5_small_medium_title_generation import t5model as generate_title
-from marp_wrapper import marp
+from utils.marp_wrapper import marp
 from utils.chunk import LangChainChunker
 from utils.ppt import generate_ppt
 
