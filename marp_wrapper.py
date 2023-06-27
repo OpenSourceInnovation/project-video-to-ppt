@@ -14,7 +14,7 @@ class marp:
         _class: str = "lead",
         paginate: bool = True,
         background: str = "#fff",
-        backgroundImage: str = "",
+        backgroundImage: str = None,
     ):
         # ---
         # theme: gaia
@@ -31,7 +31,8 @@ class marp:
         else:
             self.marp_write(f"paginate: false\n")
         self.marp_write(f"backgroundColor: {background}\n")
-        self.marp_write(f"backgroundImage: {backgroundImage}\n")
+        if backgroundImage is not None:
+            self.marp_write(f"backgroundImage: url('{backgroundImage}')\n")
         self.marp_write("---\n")
     
     def addpage(self, title, body):
