@@ -35,7 +35,9 @@ class marp:
             self.marp_write(f"backgroundImage: {backgroundImage}\n")
         self.marp_write("---\n")
     
-    def addpage(self, title, body):
+    def addpage(self, title, body, directives: str = None):
+        if directives is not None:
+            self.marp_write(directives)
         self.marp_write(md.h1(title))
         self.marp_write(body)
         self.marp_write("\n\n---\n\n")
