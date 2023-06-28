@@ -16,6 +16,35 @@ def code(lang, text):
 def link(text, url):
     return f"[{text}]({url})"
 
+def image(
+    url,
+    align=None,
+    height=None,
+    setAsBackground=False,
+    ):
+    
+    """Summary
+    return markdown image syntax with marp options
+
+    Args:
+        url (str): image url (only online images)
+        align (str, optional): image alignment (left, right, center)
+        height (str, optional): image height (ex:"2in")
+        setAsBackground (bool, optional): set image as background
+    Returns:
+        _type_: _description_
+    """
+    
+    options = ""
+    if align is not None:
+        options += f"{align}"
+    if height is not None:
+        options += f" {height}"
+    if setAsBackground:
+        oprions += " bg"
+    
+    return f"![{options}]({url})"
+
 def quote(text):
     return f"> {text}"
 
