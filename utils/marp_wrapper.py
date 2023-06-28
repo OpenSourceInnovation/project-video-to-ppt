@@ -32,7 +32,7 @@ class marp:
             self.marp_write(f"paginate: false\n")
         self.marp_write(f"backgroundColor: {background}\n")
         if backgroundImage is not None:
-            self.marp_write(f"backgroundImage: url('{backgroundImage}')\n")
+            self.marp_write(f"backgroundImage: {backgroundImage}\n")
         self.marp_write("---\n")
     
     def addpage(self, title, body):
