@@ -14,4 +14,4 @@ def generate_ppt(markdown_source, output_name, chromium_path="./chrome_sandbox")
         raise Exception("Markdown source does not exist")
     
     # generate ppt
-    os.system(f"marp {markdown_source} -o {output_name}")
+    os.system(f"marp {markdown_source} -o {output_name} --allow-local-files")

@@ -34,6 +34,9 @@ class LangChainChunker:
     def chunker(self, size=1000):
         from langchain.text_splitter import CharacterTextSplitter
         
+        # attach the duration of the video to the chunk
+        # [[chunk, duration]]
+        
         text_splitter = CharacterTextSplitter(
             separator=" ",
             chunk_size=size,

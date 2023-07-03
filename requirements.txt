@@ -4,3 +4,5 @@ nltk
 youtube_transcript_api
 accelerate
 langchain
+yt-dlp
+ffmpeg

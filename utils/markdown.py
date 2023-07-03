@@ -41,7 +41,7 @@ def image(
     if height is not None:
         options += f" {height}"
     if setAsBackground:
-        oprions += " bg"
+        options += " bg"
     
     return f"![{options}]({url})"
 
