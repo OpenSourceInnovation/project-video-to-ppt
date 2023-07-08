@@ -42,8 +42,8 @@ class video:
                     "ffmpeg", 
                     "-hide_banner",
                     "-loglevel", "panic",
-                    "-i", f"{self.path}.webm", 
                     "-ss", timestamp, 
+                    "-i", f"{self.path}.webm", 
                     "-vframes", "1", 
                     f"{filename}"
                 ]
