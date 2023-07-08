@@ -6,7 +6,7 @@ def generate_ppt(markdown_source, output_name, chromium_path="./chrome_sandbox")
         raise Exception("Marp is not installed")
     
     # if user is root, then set CHROMIUM_PATH to chromium_path
-    if os.getuid() == 0:
+    if os.getuid() == 0 and os.name == "posix":
         os.environ["CHROME_PATH"] = chromium_path
     
     # check for markdown source
