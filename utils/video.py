@@ -1,4 +1,4 @@
-import ffmpeg, subprocess, os
+import subprocess, os
 
 def Popen(cmd: list) -> str:
     """Run a command and return the output as a string
