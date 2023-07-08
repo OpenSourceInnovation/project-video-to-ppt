@@ -49,7 +49,6 @@ class marp:
         self.writeifNotNone(f"<!-- {directives} -->\n")
         self.writeifNotNone(title)
         self.writeifNotNone(body)
-        self.marp_end()
     
     def add_directives(self, directives: str):
         self.marp_write(f"<!-- {directives} -->\n")
