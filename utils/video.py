@@ -15,6 +15,10 @@ class video:
     def __init__(self,url, path):
         self.path = path
         self.url = url
+        
+        # check if directory exists
+        if not os.path.exists(self.path.split("/")[-1]):
+            os.mkdir(self.path.split("/")[-1])
     
     def download(self):
         if os.path.exists(f"{self.path}.webm"):
