@@ -39,19 +39,16 @@ def run():
     chunk_num = 1
     for chunk in track(chunks, description="Processing chunks"):
         print(f"processing Chunk: {chunk_num}/{chunk_len}")
+        timestamp = str(datetime.timedelta(seconds=chunk[1]))
+        img_path  = f"out/vid-{VIDEO_ID}_{timestamp}.png"
+        
         summary = summarize(chunk[0])
-        vid.getframe(
-            str(datetime.timedelta(seconds=chunk[1]))
-        )
+        vid.getframe(timestamp)
         title = generate_title(summary)
 
-        ppt.add_page(
-            md.h2(title),
-            summary
-        )
+        ppt.add_page( md.h2(title), summary )
 
-        ppt.add_body(md.image(
-            f"vid-{VIDEO_ID}_{str(datetime.timedelta(seconds=chunk[1]))}.png",
+        ppt.add_body(md.image( img_path,
             align="left", setAsBackground=True, height="2in"))
         ppt.marp_end()
         chunk_num += 1
