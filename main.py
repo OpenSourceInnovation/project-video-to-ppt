@@ -24,7 +24,7 @@ def run():
 
     # Generate video
     vid = video(f"https://youtu.be/{VIDEO_ID}",
-                f"vid-{VIDEO_ID}")
+                f"out/vid-{VIDEO_ID}")
     vid.download()
     
     # Get the Subtitles from the YouTube video
