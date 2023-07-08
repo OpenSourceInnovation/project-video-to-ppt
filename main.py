@@ -6,6 +6,7 @@ VIDEO_ID    =   ""
 OUT_PPT_NAME=   "out.pptx"
 
 def run():
+    from rich.progress import track
     from utils.subtitles import getSubsText
     from models.distilbart_cnn_12_6 import summarize
     from models.t5_small_medium_title_generation import t5model as generate_title
@@ -36,7 +37,7 @@ def run():
     print(f"subtitles divided to {chunk_len} chunks")
 
     chunk_num = 1
-    for chunk in chunks:
+    for chunk in track(chunks, description="Processing chunks"):
         print(f"processing Chunk: {chunk_num}/{chunk_len}")
         summary = summarize(chunk[0])
         vid.getframe(
