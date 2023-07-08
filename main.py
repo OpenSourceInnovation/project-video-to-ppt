@@ -16,6 +16,7 @@ def run():
     from utils.subtitles import subs as chunker
     from utils.ppt import generate_ppt
     from utils.video import video
+    import os
     
     # Intermediary Markdown file
     print("Creating Markdown file...")
@@ -56,8 +57,10 @@ def run():
 
         ppt.add_page( md.h2(title), summary )
 
-        ppt.add_body(md.image( img_path,
+        if os.path.exists(img_path):
+            ppt.add_body(md.image( img_path,
             align="left", setAsBackground=True, size="contain"))
+            
         ppt.marp_end()
         chunk_num += 1
         continue
