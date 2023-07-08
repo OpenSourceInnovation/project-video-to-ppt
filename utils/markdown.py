@@ -20,6 +20,7 @@ def image(
     url,
     align=None,
     height=None,
+    size=None,
     setAsBackground=False,
     ):
     
@@ -30,6 +31,7 @@ def image(
         url (str): image url (only online images)
         align (str, optional): image alignment (left, right, center)
         height (str, optional): image height (ex:"2in")
+        size (str, optional): cover, contain, auto, fix, x%
         setAsBackground (bool, optional): set image as background
     Returns:
         _type_: _description_
@@ -40,6 +42,8 @@ def image(
         options += f"{align}"
     if height is not None:
         options += f" {height}"
+    if size is not None:
+        options += f" {size}"
     if setAsBackground:
         options += " bg"
     

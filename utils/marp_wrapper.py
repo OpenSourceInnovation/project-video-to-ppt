@@ -27,8 +27,9 @@ class marp:
         # backgroundImage: url('https://marp.app/assets/hero-background.svg')
         # ---
         self.marp_write("---\n")
-        self.marp_write(f"theme: gaia\n")
-        self.marp_write(f"_class: {_class}\n")
+        self.marp_write("marp: true\n")
+        self.marp_write(f"theme: {theme}\n")
+        self.marp_write(f"class: {_class}\n")
         if paginate:
             self.marp_write(f"paginate: true\n")
         else:

@@ -20,8 +20,15 @@ def run():
     # Intermediary Markdown file
     print("Creating Markdown file...")
     ppt = marp("summary.md")
-    ppt.add_header()
-
+    ppt.add_header(
+        theme="uncover",
+        background="",
+        _class="invert",
+    )
+    
+    # smaller font size (1.5rem)
+    ppt.add_body("<style> section { font-size: 1.5rem; } </style>")
+    
     # Generate video
     vid = video(f"https://youtu.be/{VIDEO_ID}",
                 f"out/vid-{VIDEO_ID}")
@@ -50,7 +57,7 @@ def run():
         ppt.add_page( md.h2(title), summary )
 
         ppt.add_body(md.image( img_path,
-            align="left", setAsBackground=True, height="2in"))
+            align="left", setAsBackground=True, size="contain"))
         ppt.marp_end()
         chunk_num += 1
         continue
@@ -83,6 +90,6 @@ if __name__ == "__main__":
         CHUNK_SIZE = int(opts.chunk_size)
     
     if opts.out_ppt_name is not None:
-        OUT_PPT_NAME = optparse.out_ppt_name
+        OUT_PPT_NAME = opts.out_ppt_name
     
     run()
