@@ -40,6 +40,8 @@ class video:
             Popen(
                 [
                     "ffmpeg", 
+                    "-hide_banner",
+                    "-loglevel", "panic",
                     "-i", f"{self.path}.webm", 
                     "-ss", timestamp, 
                     "-vframes", "1", 
