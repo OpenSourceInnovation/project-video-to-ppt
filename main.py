@@ -40,6 +40,7 @@ def run():
     for chunk in track(chunks, description="Processing chunks"):
         print(f"processing Chunk: {chunk_num}/{chunk_len}")
         timestamp = str(datetime.timedelta(seconds=chunk[1]))
+        # TODO: better file path
         img_path  = f"out/vid-{VIDEO_ID}_{timestamp}.png"
         
         summary = summarize(chunk[0])
