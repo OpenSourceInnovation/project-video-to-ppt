@@ -11,9 +11,10 @@ class marp:
 
     def add_header(
         self,
+        theme: str = "default",
         _class: str = "lead",
         paginate: bool = True,
-        background: str = "#fff",
+        background: str = "",
         backgroundImage: str = None,
         extra_styles: str = None
     ):
