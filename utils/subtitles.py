@@ -48,24 +48,25 @@ class subs:
     def getSubsRaw(self):
         return self.subs
     
-    def getSubsList(self, size=1000, match_str=None):
+    def getSubsList(self, size=100):
         subs = json.loads(json.dumps(self.subs))
-        chunk = []
-        current_chunk = ""
-        curr_duration = 0
+        chunks = []
+        current_chunk = "" # limited to {size}
+        current_duaration = 0  # TODO: add better variable name
+        c_d_target = 2
+        c_d_count = 0
         
-        for sub in subs:
-            if len(current_chunk) + len(sub["text"]) + 1 <= size:
-                current_chunk += f"{sub['text']} "
+        for subline in subs:
+            current_duaration = subline["start"]
+            if len(current_chunk) + len(subline["text"]) + 1 <= size:
+                current_chunk += f"{subline['text']} "
             else:
-                curr_duration += sub["duration"]
-                chunk.append(
+                chunks.append(
                     [
-                    current_chunk.strip(),
-                    curr_duration
+                        current_chunk.strip(),
+                        current_duaration
                     ]
                 )
-                current_chunk = f"{sub['text']} "
-                
-        return chunk
-
+                current_chunk = f"{subline['text']} "
+        
+        return chunks    
