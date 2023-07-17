@@ -53,3 +53,22 @@ class video:
                 ]
             )
         )
+    
+    def getAudio(self, out="out.mp3"):
+        print("Getting audio...")
+        (
+            Popen(
+                [
+                    "ffmpeg", 
+                    "-hide_banner",
+                    "-loglevel", "panic",
+                    "-i", f"{self.path}.webm", 
+                    "-vn", 
+                    "-ar", "44100", 
+                    "-ac", "2", 
+                    "-ab", "192K", 
+                    "-f", "mp3", 
+                    out
+                ]
+            )
+        )
