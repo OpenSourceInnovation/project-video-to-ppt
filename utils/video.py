@@ -32,11 +32,10 @@ class video:
         # )
         os.system(f"yt-dlp {self.url} -o {self.path}")
     
-    def getframe(self, timestamp):
-        filename = f"{self.path}_{timestamp}.png"
-        
+    def getframe(self, timestamp, out=os.curdir):
+        filename = out
         if os.path.exists(filename):
-            print(f"{filename} already exists, skipping download")
+            print(f"{filename} already exists, skipping frame")
             return
         
         print(f"Getting frame at {timestamp}")
@@ -49,7 +48,7 @@ class video:
                     "-ss", timestamp, 
                     "-i", f"{self.path}.webm", 
                     "-vframes", "1", 
-                    f"{filename}"
+                    filename
                 ]
             )
         )
