@@ -1,9 +1,12 @@
 import argparse, datetime
 from signal import signal, SIGINT
+import constants as c
+import os
 
 CHUNK_SIZE  =   512
 VIDEO_ID    =   ""
-OUT_PPT_NAME=   "out.pptx"
+OUT_PPT_NAME=   c.PPTX_DEST
+NO_IMAGES   =   False
 
 def run():
     from rich.progress import track
@@ -14,11 +17,10 @@ def run():
     from utils.subtitles import subs as chunker
     from utils.ppt import generate_ppt
     from utils.video import video
-    import os
     
     # Intermediary Markdown file
     print("Creating Markdown file...")
-    ppt = marp("summary.md")
+    ppt = marp(c.MD_DEST)
     ppt.add_header(
         theme="uncover",
         background="",
@@ -29,8 +31,7 @@ def run():
     ppt.add_body("<style> section { font-size: 1.5rem; } </style>")
     
     # Generate video
-    vid = video(f"https://youtu.be/{VIDEO_ID}",
-                f"out/vid-{VIDEO_ID}")
+    vid = video(f"https://youtu.be/{VIDEO_ID}", f"{c.OUTDIR}/vid-{VIDEO_ID}")
     vid.download()
     
     # Get the Subtitles from the YouTube video
@@ -45,27 +46,40 @@ def run():
     chunk_num = 1
     for chunk in track(chunks, description="Processing chunks"):
         print(f"processing Chunk: {chunk_num}/{chunk_len}")
-        timestamp = str(datetime.timedelta(seconds=chunk[1]))
-        # TODO: better file path
-        img_path  = f"out/vid-{VIDEO_ID}_{timestamp}.png"
         
-        summary = summarize(chunk[0])
-        vid.getframe(timestamp)
-        title = generate_title(summary)
-
-        ppt.add_page( md.h2(title), summary )
+        timestamp = str(datetime.timedelta(seconds=chunk[1]))
+        img_path  = f"{c.PNG_DEST}/vid-{VIDEO_ID}_{timestamp}.png"
+        
+        summary = summarize(str(chunk[0]))[0]["generated_text"].replace("-", "\n-")
+        title = generate_title(str(chunk[0]))[0]["generated_text"]
+        
+        # heading size control
+        if len(title) < 40:
+            heading = md.h2
+        if len(title) > 50:
+            heading = md.h3
+        
+        ppt.add_page( heading(title), summary )
+        
+        if not NO_IMAGES:
+            vid.getframe(timestamp=timestamp, out=img_path)
 
         if os.path.exists(img_path):
-            ppt.add_body(md.image( img_path,
-            align="left", setAsBackground=True, size="contain"))
+            # if summary is long ignore images for better page and no clipping
+            if len(summary+title) < 270:
+                ppt.add_body(md.image( 
+                                  img_path.replace(f"{c.OUTEXTRA}/", ""),
+                                  align="left",
+                                  setAsBackground=True, 
+                                  size="contain"
+                                  ))
             
         ppt.marp_end()
         chunk_num += 1
-        continue
 
     print(f"Generating {OUT_PPT_NAME}..")
     ppt.close_file()
-    generate_ppt("summary.md", OUT_PPT_NAME)
+    generate_ppt(c.MD_DEST, OUT_PPT_NAME)
 
 def exithandle(_signal, _frame):
     print(f"\nExiting... | {str(_signal)} | {str(_frame)}")
