@@ -99,4 +99,10 @@ if __name__ == "__main__":
     if opts.out_ppt_name is not None:
         OUT_PPT_NAME = opts.out_ppt_name
     
+    if not os.path.exists(c.OUTDIR):
+        os.mkdir(c.OUTDIR)
+        os.mkdir(c.OUTEXTRA)
+    
+    if not os.path.exists(c.OUTEXTRA):
+        os.mkdir(c.OUTEXTRA)
     run()
