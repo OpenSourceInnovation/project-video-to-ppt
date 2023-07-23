@@ -1,4 +1,4 @@
-import optparse, datetime
+import argparse, datetime
 from signal import signal, SIGINT
 
 CHUNK_SIZE  =   512
@@ -76,12 +76,16 @@ def exithandle(_signal, _frame):
 if __name__ == "__main__":
     signal(SIGINT, exithandle)
     
-    optparser = optparse.OptionParser()
-    optparser.add_option("-v", "--video", dest="video_id", help="YouTube video ID")
-    optparser.add_option("--chunk-size", dest="chunk_size", type="int")
-    optparser.add_option( "-o", "--out", dest="out_ppt_name")
+    optparser = argparse.ArgumentParser(
+        prog="video to ppt (dev)",
+        description="Convert Youtube videos to PPT/pdf with large language models"
+    )
+    optparser.add_argument("-v", "--video", dest="video_id", help="YouTube video ID")
+    optparser.add_argument("--chunk-size", dest="chunk_size", type=int)
+    optparser.add_argument( "-o", "--out", dest="out_ppt_name")
+    optparser.add_argument("--no-images", dest="no_images", action="store_true")
     
-    (opts, _) = optparser.parse_args()
+    opts = optparser.parse_args()
     
     if opts.video_id is None:
         print("Please provide a YouTube video ID")
