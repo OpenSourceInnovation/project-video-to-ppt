@@ -7,12 +7,10 @@ OUT_PPT_NAME=   "out.pptx"
 
 def run():
     from rich.progress import track
-    from utils.subtitles import getSubsText
-    from models.distilbart_cnn_12_6 import summarize
-    from models.t5_small_medium_title_generation import t5model as generate_title
+    from models.lamini import summarize
+    from models.lamini import generate_title
     from utils.marp_wrapper import marp
     import utils.markdown as md
-    # from utils.chunk import LangChainChunker as chunker
     from utils.subtitles import subs as chunker
     from utils.ppt import generate_ppt
     from utils.video import video
