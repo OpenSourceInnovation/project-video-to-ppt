@@ -19,3 +19,15 @@ PNG_DEST = f"{OUTEXTRA}"
 # name for generated ppt
 PPT_DEST = f"{OUTDIR}/out.ppt"
  
+## MARP CONFIGURATION
+MARP_01 = {
+    "theme": "uncover",
+    "background": "",
+    "class": "invert",
+}
+
+MARP_02 = {
+    "theme": "marpit-theme",
+    "background": "",
+    "class": "",
+}
