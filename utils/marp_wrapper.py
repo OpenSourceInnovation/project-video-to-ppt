@@ -16,7 +16,8 @@ class marp:
         paginate: bool = True,
         background: str = "",
         backgroundImage: str = None,
-        extra_styles: str = None
+        extra_styles: str = None,
+        config: dict = None
     ):
         ## write the header
         # ---
@@ -26,6 +27,12 @@ class marp:
         # backgroundColor: #fff
         # backgroundImage: url('https://marp.app/assets/hero-background.svg')
         # ---
+        
+        if config is not None:
+            theme = config["theme"]
+            background = config["background"]
+            _class = config["class"]
+            
         self.marp_write("---\n")
         self.marp_write("marp: true\n")
         self.marp_write(f"theme: {theme}\n")
