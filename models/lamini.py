@@ -8,7 +8,7 @@ from transformers import (
 
 model_id = "MBZUAI/LaMini-Flan-T5-248M"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
-model = AutoModelForSeq2SeqLM.from_pretrained(model_id)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_id, device_map="cuda:0")
 gen_config = GenerationConfig.from_pretrained(model_id)
 
 
