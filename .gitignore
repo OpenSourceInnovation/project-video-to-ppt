@@ -8,3 +8,5 @@ summary.md
 test*
 vid-*
 video-pdf
+notebooks/**
+out/**

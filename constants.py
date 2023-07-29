@@ -1,3 +1,6 @@
+import os
+from chromadb.config import Settings
+
 # to store all the generated files (*.pdf, *pptx, *webm, *mp3)
 OUTDIR="out"
 
@@ -26,8 +29,22 @@ MARP_01 = {
     "class": "invert",
 }
 
+MARP_GAIA = {
+    "theme": "gaia",
+    "background": "",
+    "class": "lead",
+}
+
 MARP_02 = {
     "theme": "marpit-theme",
     "background": "",
     "class": "",
 }
+
+# ChromaDB settings
+EMBEDDINGS = "hkunlp/instructor-large"
+
+# summarizer options
+SUM_CHAIN_TYPE = "stuff"
+
+YT_CHAPTER_ENDPOINT = "https://yt.lemnoslife.com/videos?part=chapters&id="
