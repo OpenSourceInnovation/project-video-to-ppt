@@ -1,6 +1,12 @@
-import argparse, datetime, os, requests, json
+import argparse
+import datetime
+import json
+import os
 import textwrap
-from signal import signal, SIGINT
+from signal import SIGINT, signal
+
+import requests
+
 from constants import *
 
 CHUNK_SIZE  =   512
@@ -10,21 +16,21 @@ NO_IMAGES   =   False
 QUESTIONS   =   5
 
 def run():
-    from models.lamini import lamini as model
-    from utils.subtitles import subs
-    from rich.progress import track
-    from utils.video import video
-    from utils.marp_wrapper import marp
-    from utils.ppt import generate_ppt
-    import utils.markdown as md
-    
+    from langchain.chains.summarize import load_summarize_chain
     # from langchain.vectorstores import Chroma
     # from langchain.embeddings.huggingface import HuggingFaceEmbeddings
     # from langchain.chains import RetrievalQA
     # from langchain.llms import HuggingFacePipeline
     from langchain.docstore.document import Document
-    from langchain.chains.summarize import load_summarize_chain
-    
+    from rich.progress import track
+
+    import utils.markdown as md
+    from models.lamini import lamini as model
+    from utils.marp_wrapper import marp
+    from utils.ppt import generate_ppt
+    from utils.subtitles import subs
+    from utils.video import video
+
     # intialize marp
     out = marp(MD_DEST)
     out.add_header(config=MARP_GAIA)

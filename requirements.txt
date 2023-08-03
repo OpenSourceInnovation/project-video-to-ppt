@@ -6,3 +6,4 @@ accelerate
 langchain
 yt-dlp
 rich
+chromadb
