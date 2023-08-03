@@ -6,3 +6,7 @@ subs.txt
 summary.md
 *.pptx
 test*
+vid-*
+video-pdf
+notebooks/**
+out/**
