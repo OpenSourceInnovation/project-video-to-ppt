@@ -128,7 +128,7 @@ def run():
 
     print(f"Generating {OUT_PPT_NAME}..")
     out.close_file()
-    generate_ppt(c.MD_DEST, OUT_PPT_NAME)
+    generate_ppt(MD_DEST, OUT_PPT_NAME)
 
 def exithandle(_signal, _frame):
     print(f"\nExiting... | {str(_signal)} | {str(_frame)}")
