@@ -32,6 +32,8 @@ def run():
     from utils.ppt import generate_ppt
     from utils.subtitles import subs
     from utils.video import video
+    from utils.chunk import ChunkByChapters
+    
     # intialize marp
     out = marp(MD_DEST)
     out.add_header(config=MARP_GAIA)
@@ -61,51 +63,8 @@ def run():
         exit()
     
     info(f"got {len(raw_subs)} length subtitles")
-
-    # chunk processing
-    chunks = []
-    chunk_dict = {}
-    if len(raw_chapters) != 0:
-        chapters = [[chapter['title'], chapter['time']] for chapter in raw_chapters]
-        # set timestamp to last second of chapter
-        for c in range(len(chapters)-1):
-            if c == len(chapters):
-                break
-            chapters[c][1] = chapters[c+1][1] - 1
-        
-        # chunking based on chapters
-        for c in track(range(len(chapters)-1), description="Chunking.."):
-            title    = chapters[c][0]
-            start    = 0 if c == 0 else chapters[c-1][1]+1
-            duration = chapters[c][1]
-            
-            current_chunk = ""
-            
-            for sublinedata in raw_subs:
-                cstart: int = sublinedata['start']
-                subline: str = sublinedata['text']
-                
-                # TODO: Optimise by slicing?
-                if cstart < start:
-                    continue
-                if cstart >= duration:
-                    break
-                
-                total_size = len(current_chunk) + len(subline)
-                if total_size + 1 < CHUNK_SIZE:
-                    current_chunk += subline
-                else:
-                    chunks.append(
-                        [
-                            [current_chunk.strip()],
-                            [cstart],
-                        ]
-                    )
-                    current_chunk = ""
-            
-            chunk_dict.update({title: chunks})
-            chunks = []
     
+    chunk_dict = ChunkByChapters(raw_chapters, raw_subs, CHUNK_SIZE)
     chain = load_summarize_chain(llm, chain_type="stuff")
 
     # TODO: Tommorow ( use refine chain type to summarize all chapters )
