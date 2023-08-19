@@ -1,4 +1,5 @@
 import subprocess, os
+from utils.log import info
 
 def Popen(cmd: list) -> str:
     """Run a command and return the output as a string
@@ -22,9 +23,9 @@ class video:
     
     def download(self):
         if os.path.exists(f"{self.path}.webm"):
-            print(f"{self.path}.webm already exists, skipping download")
+            info(f"{self.path}.webm already exists, skipping download")
             return
-        print(f"Downloading {self.url}")
+        info(f"Downloading {self.url}")
         # (
         #     Popen(
         #             ["yt-dlp", self.url, "-o", self.path ]
@@ -35,10 +36,10 @@ class video:
     def getframe(self, timestamp, out=os.curdir):
         filename = out
         if os.path.exists(filename):
-            print(f"{filename} already exists, skipping frame")
+            info(f"{filename} already exists, skipping frame")
             return
         
-        print(f"Getting frame at {timestamp}")
+        info(f"Getting frame at {timestamp}")
         (
             Popen(
                 [
@@ -54,7 +55,7 @@ class video:
         )
     
     def getAudio(self, out="out.mp3"):
-        print("Getting audio...")
+        info("Getting audio...")
         (
             Popen(
                 [

@@ -4,6 +4,7 @@ import json
 import os
 import textwrap
 from signal import SIGINT, signal
+from utils.log import debug, info, logging
 
 import requests
 
@@ -16,6 +17,7 @@ NO_IMAGES   =   False
 QUESTIONS   =   5
 
 def run():
+    info("Loading modules..")
     from langchain.chains.summarize import load_summarize_chain
     # from langchain.vectorstores import Chroma
     # from langchain.embeddings.huggingface import HuggingFaceEmbeddings
@@ -30,7 +32,6 @@ def run():
     from utils.ppt import generate_ppt
     from utils.subtitles import subs
     from utils.video import video
-
     # intialize marp
     out = marp(MD_DEST)
     out.add_header(config=MARP_GAIA)
@@ -55,6 +56,8 @@ def run():
     raw_chapters = res.json()['items'][0]['chapters']['chapters']
     raw_subs = json.loads(json.dumps(subs(VIDEO_ID).getSubsRaw()))
     
+    info(f"got {len(raw_subs)} length subtitles")
+
     # chunk processing
     chunks = []
     chunk_dict = {}
@@ -108,6 +111,7 @@ def run():
         # get summary for every topic with stuff/refine chain
         # add to final summary
         
+        debug(subchunks)
         docs = [ Document(page_content=t[0]) for t in subchunks[0] ]
         summary = chain.run(docs)
         
@@ -126,12 +130,13 @@ def run():
         out.add_page(md.h2(title), summary)
         out.marp_end()
 
-    print(f"Generating {OUT_PPT_NAME}..")
+    info(f"Generating {OUT_PPT_NAME}..")
     out.close_file()
     generate_ppt(MD_DEST, OUT_PPT_NAME)
+    print(f"Done! {OUT_PPT_NAME}")
 
 def exithandle(_signal, _frame):
-    print(f"\nExiting... | {str(_signal)} | {str(_frame)}")
+    logging.warning(f"Exiting... | {str(_signal)} | {str(_frame)}")
     exit()
 
 if __name__ == "__main__":
@@ -145,6 +150,7 @@ if __name__ == "__main__":
     optparser.add_argument("--chunk-size", dest="chunk_size", type=int)
     optparser.add_argument( "-o", "--out", dest="out_ppt_name")
     optparser.add_argument("--no-images", dest="no_images", action="store_true")
+    optparser.add_argument("--debug", dest="debug", action="store_true", default=False)
     
     opts = optparser.parse_args()
     
@@ -166,4 +172,9 @@ if __name__ == "__main__":
     
     if not os.path.exists(OUTEXTRA):
         os.mkdir(OUTEXTRA)
+    
+    if opts.debug:
+        DEBUG = True
+        print("Debug mode enabled")
+    
     run()
