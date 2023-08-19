@@ -151,6 +151,7 @@ if __name__ == "__main__":
     optparser.add_argument("--chunk-size", dest="chunk_size", type=int)
     optparser.add_argument( "-o", "--out", dest="out_ppt_name")
     optparser.add_argument("--no-images", dest="no_images", action="store_true")
+    optparser.add_argument("--no-chapters", dest="no_chapters", action="store_true")
     
     opts = optparser.parse_args()
     
@@ -165,6 +166,9 @@ if __name__ == "__main__":
     
     if opts.out_ppt_name is not None:
         OUT_PPT_NAME = opts.out_ppt_name
+    
+    if optparser.no_chapters is True:
+        NO_CHAPTERS = True
     
     if not os.path.exists(OUTDIR):
         os.mkdir(OUTDIR)

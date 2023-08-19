@@ -48,4 +48,4 @@ EMBEDDINGS = "hkunlp/instructor-large"
 SUM_CHAIN_TYPE = "stuff"
 
 YT_CHAPTER_ENDPOINT = "https://yt.lemnoslife.com/videos?part=chapters&id="
-
+NO_CHAPTERS = False
