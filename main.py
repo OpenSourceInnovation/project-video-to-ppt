@@ -1,8 +1,7 @@
 import argparse
 import datetime
-import json
 import os
-import textwrap
+import gradio as gr
 from signal import SIGINT, signal
 from utils.log import debug, info, logger, breakPoint as bc
 
@@ -15,6 +14,50 @@ VIDEO_ID    =   ""
 OUT_PPT_NAME=   PPTX_DEST
 NO_IMAGES   =   False
 QUESTIONS   =   5
+
+def questionMode():
+    from langchain.vectorstores import Chroma
+    from langchain.embeddings import HuggingFaceInstructEmbeddings
+    from langchain.chains import RetrievalQA
+    from rich.progress import track
+    
+    from models.lamini import lamini as model
+    from utils.subtitles import getSubsText
+    from utils.chunk import LangChainChunker
+    
+    EMBEDS = HuggingFaceInstructEmbeddings(model_name=EMBEDDINGS, model_kwargs={"device": "cuda:0"})
+    subs = getSubsText(VIDEO_ID)
+    chunker = LangChainChunker(subs)
+    chunks = chunker.chunker(size=CHUNK_SIZE)
+    
+    info("Chunks size: " + str(len(chunks)))
+    db   = Chroma.from_texts(chunks, EMBEDS)
+    retriver = db.as_retriever(search_type="mmr")
+    
+    # initialize model
+    llm_model = model
+    llm = llm_model.load_model(
+            max_length=400,
+            temperature=0,
+            top_p=0.95,
+            repetition_penalty=1.15
+    )
+    
+    qa = RetrievalQA.from_chain_type(
+        llm=llm, chain_type="map_reduce", retriever=retriver
+    )
+    
+    def interface(msg, history):
+        res = qa(msg)
+        return str(res['result'])
+    
+    ui = gr.ChatInterface(
+        fn=interface,
+        examples=["What is the video about?", "key points of the video"],
+        title=f"Question Mode - {VIDEO_ID}",
+    )
+    
+    ui.launch()
 
 def run():
     info("Loading modules..")
@@ -54,8 +97,7 @@ def run():
     
     # slice subtitle and chunk them 
     # to CHUNK_SIZE based on chapters
-    info(f"Getting subtitles & chapters for video {VIDEO_ID}..")
-    raw_chapters = vid.getChapters(f"{YT_CHAPTER_ENDPOINT}{VIDEO_ID}")
+    info(f"Getting subtitles {VIDEO_ID}..")
     raw_subs     = vid.getSubtitles()
     
     if raw_subs is None:
@@ -64,8 +106,14 @@ def run():
     
     info(f"got {len(raw_subs)} length subtitles")
     
-    chunk_dict = ChunkByChapters(raw_chapters, raw_subs, CHUNK_SIZE)
-    chain = load_summarize_chain(llm, chain_type="stuff")
+    
+    if NO_CHAPTERS:
+        pass
+    else:
+        raw_chapters = vid.getChapters(f"{YT_CHAPTER_ENDPOINT}{VIDEO_ID}")
+        chunk_dict = ChunkByChapters(raw_chapters, raw_subs, CHUNK_SIZE)
+        chain = load_summarize_chain(llm, chain_type="stuff")
+        
 
     # TODO: Tommorow ( use refine chain type to summarize all chapters )
     img_hook = False
@@ -114,6 +162,7 @@ if __name__ == "__main__":
     optparser.add_argument( "-o", "--out", dest="out_ppt_name")
     optparser.add_argument("--no-images", dest="no_images", action="store_true")
     optparser.add_argument("--no-chapters", dest="no_chapters", action="store_true")
+    optparser.add_argument("--questions-mode", dest="qm", action="store_true")
     
     opts = optparser.parse_args()
     
@@ -128,9 +177,12 @@ if __name__ == "__main__":
     
     if opts.out_ppt_name is not None:
         OUT_PPT_NAME = opts.out_ppt_name
-    
     if opts.no_chapters is True:
         NO_CHAPTERS = True
+    
+    if opts.qm is True:
+        questionMode()
+        exit()
     
     if not os.path.exists(OUTDIR):
         os.mkdir(OUTDIR)

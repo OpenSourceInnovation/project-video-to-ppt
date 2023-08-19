@@ -7,3 +7,5 @@ langchain
 yt-dlp
 rich
 chromadb
+InstructorEmbedding
+sentence_transformers
