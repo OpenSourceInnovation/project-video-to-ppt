@@ -4,7 +4,7 @@ import json
 import os
 import textwrap
 from signal import SIGINT, signal
-from utils.log import debug, info, logger
+from utils.log import debug, info, logger, breakPoint as bc
 
 import requests
 
@@ -38,7 +38,7 @@ def run():
     # out.add_body("<style> section { font-size: 1.5rem; } </style>")
     
     # initialize video
-    vid = video(f"https://youtu.be/{VIDEO_ID}", f"{OUTDIR}/vid-{VIDEO_ID}")
+    vid = video(VIDEO_ID, f"{OUTDIR}/vid-{VIDEO_ID}")
     vid.download()
         
     # initialize model
@@ -53,9 +53,12 @@ def run():
     # slice subtitle and chunk them 
     # to CHUNK_SIZE based on chapters
     info(f"Getting subtitles & chapters for video {VIDEO_ID}..")
-    res = requests.get(f"{YT_CHAPTER_ENDPOINT}{VIDEO_ID}")
-    raw_chapters = res.json()['items'][0]['chapters']['chapters']
-    raw_subs = json.loads(json.dumps(subs(VIDEO_ID).getSubsRaw()))
+    raw_chapters = vid.getChapters(f"{YT_CHAPTER_ENDPOINT}{VIDEO_ID}")
+    raw_subs     = vid.getSubtitles()
+    
+    if raw_subs is None:
+        logger.critical("No subtitles found, exiting..")
+        exit()
     
     info(f"got {len(raw_subs)} length subtitles")
 
@@ -63,7 +66,7 @@ def run():
     chunks = []
     chunk_dict = {}
     if len(raw_chapters) != 0:
-        chapters = [[chapter['title'], chapter['time']] for chapter in res.json()['items'][0]['chapters']['chapters']]
+        chapters = [[chapter['title'], chapter['time']] for chapter in raw_chapters]
         # set timestamp to last second of chapter
         for c in range(len(chapters)-1):
             if c == len(chapters):
@@ -167,7 +170,7 @@ if __name__ == "__main__":
     if opts.out_ppt_name is not None:
         OUT_PPT_NAME = opts.out_ppt_name
     
-    if optparser.no_chapters is True:
+    if opts.no_chapters is True:
         NO_CHAPTERS = True
     
     if not os.path.exists(OUTDIR):
