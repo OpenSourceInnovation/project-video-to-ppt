@@ -49,5 +49,3 @@ SUM_CHAIN_TYPE = "stuff"
 
 YT_CHAPTER_ENDPOINT = "https://yt.lemnoslife.com/videos?part=chapters&id="
 
-# DEBUG
-DEBUG = False

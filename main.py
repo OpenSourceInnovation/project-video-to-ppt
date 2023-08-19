@@ -4,7 +4,7 @@ import json
 import os
 import textwrap
 from signal import SIGINT, signal
-from utils.log import debug, info, logging
+from utils.log import debug, info, logger
 
 import requests
 
@@ -52,6 +52,7 @@ def run():
     
     # slice subtitle and chunk them 
     # to CHUNK_SIZE based on chapters
+    info(f"Getting subtitles & chapters for video {VIDEO_ID}..")
     res = requests.get(f"{YT_CHAPTER_ENDPOINT}{VIDEO_ID}")
     raw_chapters = res.json()['items'][0]['chapters']['chapters']
     raw_subs = json.loads(json.dumps(subs(VIDEO_ID).getSubsRaw()))
@@ -136,7 +137,7 @@ def run():
     print(f"Done! {OUT_PPT_NAME}")
 
 def exithandle(_signal, _frame):
-    logging.warning(f"Exiting... | {str(_signal)} | {str(_frame)}")
+    logger.warning(f"Exiting... | {str(_signal)} | {str(_frame)}")
     exit()
 
 if __name__ == "__main__":
@@ -150,7 +151,6 @@ if __name__ == "__main__":
     optparser.add_argument("--chunk-size", dest="chunk_size", type=int)
     optparser.add_argument( "-o", "--out", dest="out_ppt_name")
     optparser.add_argument("--no-images", dest="no_images", action="store_true")
-    optparser.add_argument("--debug", dest="debug", action="store_true", default=False)
     
     opts = optparser.parse_args()
     
@@ -172,9 +172,5 @@ if __name__ == "__main__":
     
     if not os.path.exists(OUTEXTRA):
         os.mkdir(OUTEXTRA)
-    
-    if opts.debug:
-        DEBUG = True
-        print("Debug mode enabled")
     
     run()

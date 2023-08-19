@@ -1,6 +1,5 @@
 import logging
 from rich.logging import RichHandler
-from constants import DEBUG
 
 FORMAT = "%(message)s"
 logging.basicConfig(
@@ -10,16 +9,16 @@ logging.basicConfig(
     handlers=[RichHandler(rich_tracebacks=True)],
 )
 
+logger = logging.getLogger("project-v-p")
 
 def warn(msg):
-    logging.warning(msg)
+    logger.warning(msg)
 
 def info(msg):
-    logging.info(msg)
+    logger.info(msg)
 
 def debug(msg):
-    if DEBUG:
-        logging.debug(msg)
+    logger.debug(msg)
 
 def breakPoint():
     
@@ -34,5 +33,5 @@ def breakPoint():
     if user_input.lower() == "y" or user_input == "":
         pass
     else:
-        logging.info("Exiting...")
+        logger.info("Exiting...")
         exit()
