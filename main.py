@@ -108,38 +108,56 @@ def run():
     
     
     if NO_CHAPTERS:
-        pass
+        chunker = subs(VIDEO_ID)
+        chunks = chunker.getSubsList(size=CHUNK_SIZE)
+        model_tmplts = llm_model.templates()
+        summarizer = model_tmplts.summarize
+        title_gen = model_tmplts.generate_title
+        
+        for chunk in track(chunks, description="(processing chunks) Summarizing.."):
+            summary = summarizer(chunk[0])[0]["generated_text"].replace("-", "\n-")
+            title = title_gen(chunk[0])[0]["generated_text"]
+            
+            if not NO_IMAGES and len(summary+title) < 270:
+                timestamp = str(datetime.timedelta(seconds=chunk[1]))
+                imgPath = f"{PNG_DEST}/vid-{VIDEO_ID}_{timestamp}.png"
+                vid.getframe(timestamp, imgPath)
+                
+            heading = md.h2 if len(title) < 40 else md.h3
+            out.add_page(heading(title), summary)
+            out.marp_end()
     else:
         raw_chapters = vid.getChapters(f"{YT_CHAPTER_ENDPOINT}{VIDEO_ID}")
         chunk_dict = ChunkByChapters(raw_chapters, raw_subs, CHUNK_SIZE)
         chain = load_summarize_chain(llm, chain_type="stuff")
-        
+            # TODO: ( use refine chain type to summarize all chapters )
+        img_hook = False
+        for title, subchunks in track(chunk_dict.items(), description="(processing chunks) Summarizing.."):
+            # Typecase subchunks to Document for every topic
+            # get summary for every topic with stuff/refine chain
+            # add to final summary
 
-    # TODO: Tommorow ( use refine chain type to summarize all chapters )
-    img_hook = False
-    for title, subchunks in track(chunk_dict.items(), description="(processing chunks) Summarizing.."):
-        # Typecase subchunks to Document for every topic
-        # get summary for every topic with stuff/refine chain
-        # add to final summary
-        
-        debug(subchunks)
-        docs = [ Document(page_content=t[0]) for t in subchunks[0] ]
-        summary = chain.run(docs)
-        
-        if img_hook == False:
-            ts = str(datetime.timedelta(seconds=subchunks[0][1][0]))
-            img_path  = f"{PNG_DEST}/vid-{VIDEO_ID}_{ts}.png"
-            vid.getframe(ts, img_path)
-            if os.path.exists(img_path):
-            # if summary is long ignore images for better page and no clipping
-                if len(summary+title) < 270:
-                    out.add_body(md.image( 
-                                      img_path.replace(f"{OUTEXTRA}/", ""),
-                                      align="left",
-                                      setAsBackground=True
-                              ))
-        out.add_page(md.h2(title), summary)
-        out.marp_end()
+            debug(subchunks)
+            docs = [ Document(page_content=t[0]) for t in subchunks[0] ]
+            summary = chain.run(docs)
+
+            if img_hook == False:
+                ts = str(datetime.timedelta(seconds=subchunks[0][1][0]))
+                img_path  = f"{PNG_DEST}/vid-{VIDEO_ID}_{ts}.png"
+                vid.getframe(ts, img_path)
+                if os.path.exists(img_path):
+                # if summary is long ignore images for better page and no clipping
+                    if len(summary+title) < 270:
+                        out.add_body(md.image( 
+                                          img_path.replace(f"{OUTEXTRA}/", ""),
+                                          align="left",
+                                          setAsBackground=True
+                                  ))
+            out.add_page(md.h2(title), summary)
+            out.marp_end()
+
+
+
 
     info(f"Generating {OUT_PPT_NAME}..")
     out.close_file()
@@ -179,6 +197,8 @@ if __name__ == "__main__":
         OUT_PPT_NAME = opts.out_ppt_name
     if opts.no_chapters is True:
         NO_CHAPTERS = True
+    if opts.no_images is True:
+        NO_IMAGES = True
     
     if opts.qm is True:
         questionMode()

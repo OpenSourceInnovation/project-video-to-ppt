@@ -47,10 +47,8 @@ class lamini:
         return llm
     
     class templates:
-        def __init__(self) -> None:
-            pass
         
-        def summarize(text):
+        def summarize(self, text):
             instructions = "summarize for better understanding: "
             pipe = pipeline(
                 "text2text-generation",
@@ -64,7 +62,7 @@ class lamini:
             )
             return pipe(instructions + text)
         
-        def generate_title(text):
+        def generate_title(self, text):
             instructions = "generate a perfect title for the following text in 6 words: "
         
             pipe = pipeline(
