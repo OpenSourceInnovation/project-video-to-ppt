@@ -1,10 +1,9 @@
 import argparse
 import datetime
-import json
 import os
-import textwrap
+import gradio as gr
 from signal import SIGINT, signal
-from utils.log import debug, info, logger
+from utils.log import debug, info, logger, breakPoint as bc
 
 import requests
 
@@ -15,6 +14,50 @@ VIDEO_ID    =   ""
 OUT_PPT_NAME=   PPTX_DEST
 NO_IMAGES   =   False
 QUESTIONS   =   5
+
+def questionMode():
+    from langchain.vectorstores import Chroma
+    from langchain.embeddings import HuggingFaceInstructEmbeddings
+    from langchain.chains import RetrievalQA
+    from rich.progress import track
+    
+    from models.lamini import lamini as model
+    from utils.subtitles import getSubsText
+    from utils.chunk import LangChainChunker
+    
+    EMBEDS = HuggingFaceInstructEmbeddings(model_name=EMBEDDINGS, model_kwargs={"device": "cuda:0"})
+    subs = getSubsText(VIDEO_ID)
+    chunker = LangChainChunker(subs)
+    chunks = chunker.chunker(size=CHUNK_SIZE)
+    
+    info("Chunks size: " + str(len(chunks)))
+    db   = Chroma.from_texts(chunks, EMBEDS)
+    retriver = db.as_retriever(search_type="mmr")
+    
+    # initialize model
+    llm_model = model
+    llm = llm_model.load_model(
+            max_length=400,
+            temperature=0,
+            top_p=0.95,
+            repetition_penalty=1.15
+    )
+    
+    qa = RetrievalQA.from_chain_type(
+        llm=llm, chain_type="map_reduce", retriever=retriver
+    )
+    
+    def interface(msg, history):
+        res = qa(msg)
+        return str(res['result'])
+    
+    ui = gr.ChatInterface(
+        fn=interface,
+        examples=["What is the video about?", "key points of the video"],
+        title=f"Question Mode - {VIDEO_ID}",
+    )
+    
+    ui.launch()
 
 def run():
     info("Loading modules..")
@@ -32,13 +75,15 @@ def run():
     from utils.ppt import generate_ppt
     from utils.subtitles import subs
     from utils.video import video
+    from utils.chunk import ChunkByChapters
+    
     # intialize marp
     out = marp(MD_DEST)
     out.add_header(config=MARP_GAIA)
     # out.add_body("<style> section { font-size: 1.5rem; } </style>")
     
     # initialize video
-    vid = video(f"https://youtu.be/{VIDEO_ID}", f"{OUTDIR}/vid-{VIDEO_ID}")
+    vid = video(VIDEO_ID, f"{OUTDIR}/vid-{VIDEO_ID}")
     vid.download()
         
     # initialize model
@@ -52,84 +97,67 @@ def run():
     
     # slice subtitle and chunk them 
     # to CHUNK_SIZE based on chapters
-    info(f"Getting subtitles & chapters for video {VIDEO_ID}..")
-    res = requests.get(f"{YT_CHAPTER_ENDPOINT}{VIDEO_ID}")
-    raw_chapters = res.json()['items'][0]['chapters']['chapters']
-    raw_subs = json.loads(json.dumps(subs(VIDEO_ID).getSubsRaw()))
+    info(f"Getting subtitles {VIDEO_ID}..")
+    raw_subs     = vid.getSubtitles()
+    
+    if raw_subs is None:
+        logger.critical("No subtitles found, exiting..")
+        exit()
     
     info(f"got {len(raw_subs)} length subtitles")
-
-    # chunk processing
-    chunks = []
-    chunk_dict = {}
-    if len(raw_chapters) != 0:
-        chapters = [[chapter['title'], chapter['time']] for chapter in res.json()['items'][0]['chapters']['chapters']]
-        # set timestamp to last second of chapter
-        for c in range(len(chapters)-1):
-            if c == len(chapters):
-                break
-            chapters[c][1] = chapters[c+1][1] - 1
-        
-        # chunking based on chapters
-        for c in track(range(len(chapters)-1), description="Chunking.."):
-            title    = chapters[c][0]
-            start    = 0 if c == 0 else chapters[c-1][1]+1
-            duration = chapters[c][1]
-            
-            current_chunk = ""
-            
-            for sublinedata in raw_subs:
-                cstart: int = sublinedata['start']
-                subline: str = sublinedata['text']
-                
-                # TODO: Optimise by slicing?
-                if cstart < start:
-                    continue
-                if cstart >= duration:
-                    break
-                
-                total_size = len(current_chunk) + len(subline)
-                if total_size + 1 < CHUNK_SIZE:
-                    current_chunk += subline
-                else:
-                    chunks.append(
-                        [
-                            [current_chunk.strip()],
-                            [cstart],
-                        ]
-                    )
-                    current_chunk = ""
-            
-            chunk_dict.update({title: chunks})
-            chunks = []
     
-    chain = load_summarize_chain(llm, chain_type="stuff")
+    
+    if NO_CHAPTERS:
+        chunker = subs(VIDEO_ID)
+        chunks = chunker.getSubsList(size=CHUNK_SIZE)
+        model_tmplts = llm_model.templates()
+        summarizer = model_tmplts.summarize
+        title_gen = model_tmplts.generate_title
+        
+        for chunk in track(chunks, description="(processing chunks) Summarizing.."):
+            summary = summarizer(chunk[0])[0]["generated_text"].replace("-", "\n-")
+            title = title_gen(chunk[0])[0]["generated_text"]
+            
+            if not NO_IMAGES and len(summary+title) < 270:
+                timestamp = str(datetime.timedelta(seconds=chunk[1]))
+                imgPath = f"{PNG_DEST}/vid-{VIDEO_ID}_{timestamp}.png"
+                vid.getframe(timestamp, imgPath)
+                
+            heading = md.h2 if len(title) < 40 else md.h3
+            out.add_page(heading(title), summary)
+            out.marp_end()
+    else:
+        raw_chapters = vid.getChapters(f"{YT_CHAPTER_ENDPOINT}{VIDEO_ID}")
+        chunk_dict = ChunkByChapters(raw_chapters, raw_subs, CHUNK_SIZE)
+        chain = load_summarize_chain(llm, chain_type="stuff")
+            # TODO: ( use refine chain type to summarize all chapters )
+        img_hook = False
+        for title, subchunks in track(chunk_dict.items(), description="(processing chunks) Summarizing.."):
+            # Typecase subchunks to Document for every topic
+            # get summary for every topic with stuff/refine chain
+            # add to final summary
 
-    # TODO: Tommorow ( use refine chain type to summarize all chapters )
-    img_hook = False
-    for title, subchunks in track(chunk_dict.items(), description="(processing chunks) Summarizing.."):
-        # Typecase subchunks to Document for every topic
-        # get summary for every topic with stuff/refine chain
-        # add to final summary
-        
-        debug(subchunks)
-        docs = [ Document(page_content=t[0]) for t in subchunks[0] ]
-        summary = chain.run(docs)
-        
-        if img_hook == False:
-            ts = str(datetime.timedelta(seconds=subchunks[0][1][0]))
-            img_path  = f"{PNG_DEST}/vid-{VIDEO_ID}_{ts}.png"
-            vid.getframe(ts, img_path)
-            if os.path.exists(img_path):
-            # if summary is long ignore images for better page and no clipping
-                if len(summary+title) < 270:
-                    out.add_body(md.image( 
-                                      img_path.replace(f"{OUTEXTRA}/", ""),
-                                      align="left",
-                                      setAsBackground=True
-                              ))
-        out.add_page(md.h2(title), summary)
-        out.marp_end()
+            debug(subchunks)
+            docs = [ Document(page_content=t[0]) for t in subchunks[0] ]
+            summary = chain.run(docs)
+
+            if img_hook == False:
+                ts = str(datetime.timedelta(seconds=subchunks[0][1][0]))
+                img_path  = f"{PNG_DEST}/vid-{VIDEO_ID}_{ts}.png"
+                vid.getframe(ts, img_path)
+                if os.path.exists(img_path):
+                # if summary is long ignore images for better page and no clipping
+                    if len(summary+title) < 270:
+                        out.add_body(md.image( 
+                                          img_path.replace(f"{OUTEXTRA}/", ""),
+                                          align="left",
+                                          setAsBackground=True
+                                  ))
+            out.add_page(md.h2(title), summary)
+            out.marp_end()
+
+
+
 
     info(f"Generating {OUT_PPT_NAME}..")
     out.close_file()
@@ -151,6 +179,8 @@ if __name__ == "__main__":
     optparser.add_argument("--chunk-size", dest="chunk_size", type=int)
     optparser.add_argument( "-o", "--out", dest="out_ppt_name")
     optparser.add_argument("--no-images", dest="no_images", action="store_true")
+    optparser.add_argument("--no-chapters", dest="no_chapters", action="store_true")
+    optparser.add_argument("--questions-mode", dest="qm", action="store_true")
     
     opts = optparser.parse_args()
     
@@ -165,6 +195,14 @@ if __name__ == "__main__":
     
     if opts.out_ppt_name is not None:
         OUT_PPT_NAME = opts.out_ppt_name
+    if opts.no_chapters is True:
+        NO_CHAPTERS = True
+    if opts.no_images is True:
+        NO_IMAGES = True
+    
+    if opts.qm is True:
+        questionMode()
+        exit()
     
     if not os.path.exists(OUTDIR):
         os.mkdir(OUTDIR)

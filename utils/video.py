@@ -1,5 +1,6 @@
-import subprocess, os
+import subprocess, os, requests, json
 from utils.log import info
+from utils.subtitles import subs
 
 def Popen(cmd: list) -> str:
     """Run a command and return the output as a string
@@ -13,9 +14,10 @@ def Popen(cmd: list) -> str:
     return subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE).stdout.read().strip().decode('utf-8')
 
 class video:
-    def __init__(self,url, path):
+    def __init__(self,id, path):
         self.path = path
-        self.url = url
+        self.url = "https://youtu.be/" + id
+        self.video_id = id
         
         # check if directory exists
         if not os.path.exists(self.path.split("/")[-1]):
@@ -70,5 +72,31 @@ class video:
                     "-f", "mp3", 
                     out
                 ]
+            )
+        )
+    
+    def getChapters(self, endpoint: str) -> list:
+        """return the chapters of the video
+
+        Args:
+            endpoint (str): endpoint to communicate to get chapters
+                            yt.lemnoslife.com recommended
+        Returns:
+            list: chapters
+        """
+        res = requests.get(f"{endpoint}")
+        chapters = res.json()['items'][0]['chapters']['chapters']
+        return chapters
+    
+    def getSubtitles(self):
+        """return the raw subtitles
+
+        Returns:
+            list: subtitles directly from youtube
+        """
+        return json.loads(
+            json.dumps(
+                subs(self.video_id)
+                .getSubsRaw()
             )
         )

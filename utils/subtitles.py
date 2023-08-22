@@ -53,8 +53,6 @@ class subs:
         chunks = []
         current_chunk = "" # limited to {size}
         current_duaration = 0  # TODO: add better variable name
-        c_d_target = 2
-        c_d_count = 0
         
         for subline in subs:
             current_duaration = subline["start"]
