@@ -21,7 +21,7 @@ else
     exit 1
 fi
 
-$PACK_MGR install -g @marp-team/marp-cli
+$PACK_MGR install -g @marp-team/marp-cli @mermaid-js/mermaid-cli
 
 # check for chromie
 if command -v google-chrome &> /dev/null
@@ -29,11 +29,5 @@ then
     echo "Google Chrome found."
 else
     echo "Google Chrome not found. Please install it."
-    exit 1
 fi
 
-# STAGE: 1 run model and generate markdown
-python3 local_summary.py
-
-# STAGE 2: generate slides
-CHROME_PATH="${PWD}/chrome_sandbox" marp summary.md -o out.pptx
