@@ -10,3 +10,4 @@ vid-*
 video-pdf
 notebooks/**
 out/**
+**.env
