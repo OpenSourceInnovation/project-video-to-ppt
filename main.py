@@ -21,11 +21,11 @@ def questionMode():
     from langchain.chains import RetrievalQA
     from rich.progress import track
     
-    from models.lamini import lamini as model
+    from models.lamini import lamini as model, device
     from utils.subtitles import getSubsText
     from utils.chunk import LangChainChunker
     
-    EMBEDS = HuggingFaceInstructEmbeddings(model_name=EMBEDDINGS, model_kwargs={"device": "cuda:0"})
+    EMBEDS = HuggingFaceInstructEmbeddings(model_name=EMBEDDINGS, model_kwargs={"device": f"{device}"})
     subs = getSubsText(VIDEO_ID)
     chunker = LangChainChunker(subs)
     chunks = chunker.chunker(size=CHUNK_SIZE)

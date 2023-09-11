@@ -1,4 +1,5 @@
 # Load model directly
+import torch
 from langchain.llms import HuggingFacePipeline
 from transformers import (
     AutoTokenizer,
@@ -9,7 +10,8 @@ from transformers import (
 
 model_id = "MBZUAI/LaMini-Flan-T5-248M"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
-model = AutoModelForSeq2SeqLM.from_pretrained(model_id, device_map="cuda:0")
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
+model = AutoModelForSeq2SeqLM.from_pretrained(model_id, device_map=device)
 gen_config = GenerationConfig.from_pretrained(model_id)
 
 class lamini:
