@@ -71,10 +71,6 @@ def gradio_run(
     
     info("Loading modules..")
     from langchain.chains.summarize import load_summarize_chain
-    # from langchain.vectorstores import Chroma
-    # from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-    # from langchain.chains import RetrievalQA
-    # from langchain.llms import HuggingFacePipeline
     from langchain.docstore.document import Document
     from rich.progress import track
 
@@ -89,7 +85,6 @@ def gradio_run(
     # intialize marp
     out = marp(MD_DEST)
     out.add_header(config=MARP_GAIA)
-    # out.add_body("<style> section { font-size: 1.5rem; } </style>")
     
     # initialize video
     vid = video(VIDEO_ID, f"{OUTDIR}/vid-{VIDEO_ID}")
@@ -191,10 +186,10 @@ def gradio_Interface():
         fn=gradio_run,
         inputs=[
             "text",
-            gr.Slider(1, 2000, 1, label="Chunk Size", info="More chunk size = longer text & shorter numbber of slides"),
+            gr.Slider(300, 2000, 1, label="Chunk Size", info="More chunk size = longer text & shorter numbber of slides"),
             gr.Checkbox(label="No Images", info="Don't keep images in output ( gives more spaces for larger text)"),
             gr.Checkbox(label="No Chapters", info="Don't use chapter based chunking"),
-            gr.Dropdown(["pptx", "pdf", "html"], label="file format", info="which file format to generte.")
+            gr.Dropdown(["pptx", "pdf", "html"], value="pptx" ,label="file format", info="which file format to generte.")
         ],
         outputs="file"
     )
@@ -211,7 +206,8 @@ def run():
     from rich.progress import track
 
     import utils.markdown as md
-    from models.lamini import lamini as model
+    # from models.lamini import lamini as model
+    from models.gpt_3 import templates, Model
     from utils.marp_wrapper import marp
     from utils.ppt import generate_ppt
     from utils.subtitles import subs
@@ -227,14 +223,14 @@ def run():
     vid = video(VIDEO_ID, f"{OUTDIR}/vid-{VIDEO_ID}")
     vid.download()
         
-    # initialize model
-    llm_model = model
-    llm = llm_model.load_model(
-            max_length=400,
-            temperature=0,
-            top_p=0.95,
-            repetition_penalty=1.15
-    )
+    # # initialize model (lamini)
+    # llm_model = model
+    # llm = llm_model.load_model(
+    #         max_length=400,
+    #         temperature=0,
+    #         top_p=0.95,
+    #         repetition_penalty=1.15
+    # )
     
     # slice subtitle and chunk them 
     # to CHUNK_SIZE based on chapters
@@ -251,13 +247,14 @@ def run():
     if NO_CHAPTERS:
         chunker = subs(VIDEO_ID)
         chunks = chunker.getSubsList(size=CHUNK_SIZE)
-        model_tmplts = llm_model.templates()
-        summarizer = model_tmplts.summarize
-        title_gen = model_tmplts.generate_title
+        # model_tmplts = llm_model.templates()
+        model_tmplts = templates()
+        summarizer = model_tmplts.ChunkSummarizer
+        title_gen = model_tmplts.ChunkTitle
         
         for chunk in track(chunks, description="(processing chunks) Summarizing.."):
-            summary = summarizer(chunk[0])[0]["generated_text"].replace("-", "\n-")
-            title = title_gen(chunk[0])[0]["generated_text"]
+            summary = summarizer(chunk[0])
+            title = title_gen(chunk[0])
             
             if not NO_IMAGES and len(summary+title) < 270:
                 timestamp = str(datetime.timedelta(seconds=chunk[1]))
@@ -270,6 +267,8 @@ def run():
     else:
         raw_chapters = vid.getChapters(f"{YT_CHAPTER_ENDPOINT}{VIDEO_ID}")
         chunk_dict = ChunkByChapters(raw_chapters, raw_subs, CHUNK_SIZE)
+        m = Model
+        llm = m.model()
         chain = load_summarize_chain(llm, chain_type="stuff")
             # TODO: ( use refine chain type to summarize all chapters )
         img_hook = False

@@ -62,7 +62,7 @@ class lamini:
                 top_p=0.95,
                 repetition_penalty=1.15
             )
-            return pipe(instructions + text)
+            return pipe(instructions + text)[0]["generated_text"].replace("-", "\n-")
         
         def generate_title(self, text):
             instructions = "generate a perfect title for the following text in 6 words: "
@@ -78,5 +78,5 @@ class lamini:
                 repetition_penalty=1.15
             )
         
-            return pipe(instructions + text)
+            return pipe(instructions + text)[0]["generated_text"]
         
