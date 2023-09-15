@@ -21,21 +21,43 @@ pip install -r requirements.txt
 
 ### Usage
 
+For basic command line usage
+
 ```bash
-python3 main.py -v <video_id> -o out.pdf
+python3 main.py -v <video_id> --no-chapers -o out.pdf
 ```
 
-## Notes
+#### GUI
 
-### strategy 1
+Project has integration with gradio to provide a GUI and clean interface to the project to startup.
 
-![s1](images/strt1.svg)
+```bash
+python3 main.py -v <video_id> -o out.pdf --gui-web
+```
 
-### strategy 2
+```cmd
+usage: video to ppt (dev) [-h] [-v VIDEO_ID] [--chunk-size CHUNK_SIZE] [-o OUT_PPT_NAME] [--no-images] [--no-chapters] [--questions-mode]
+                          [--gui-web] [--use-model TARGET_MODEL]
 
-![s2](images/strt2.svg)
+Convert Youtube videos to PPT/pdf with large language models
 
-### strategy 3
+options:
+  -h, --help            show this help message and exit
+  -v VIDEO_ID, --video VIDEO_ID
+                        YouTube video ID
+  --chunk-size CHUNK_SIZE
+  -o OUT_PPT_NAME, --out OUT_PPT_NAME
+  --no-images
+  --no-chapters
+  --questions-mode
+  --gui-web
+  --use-model TARGET_MODEL
+                        Set model to use (gpt3, lamini, bart) default: lamini
+```
 
-![s3](images/strt3.svg)
+## How it works
+
+for any given video, the project will generate a summary of the video and will create a PPT/PPTX with different slides covering the summary of the video.
+
+The video subtitles are fetched from youtube and fed to the LLM's to generate the summary of the video then the summary is used to create the PPT/PPTX with marp.
 
