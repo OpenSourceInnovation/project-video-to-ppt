@@ -54,7 +54,7 @@ class templates:
         self.TitlePipe = None
     
     def ChunkSummarizer(self, text, custom_instruction: str =None, **kwargs):
-        default_instruction = "generate a perfect title for the following text in 6 words: "
+        default_instruction = "summarize for better understanding: "
         instructions = custom_instruction if custom_instruction != None else default_instruction
         pipe = self.summaryPipe
         
