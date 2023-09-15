@@ -28,7 +28,7 @@ class templates:
         
         max_length = kwargs.get("max_length", 400)
         
-        if pipe is not None:
+        if pipe is None:
             pipe = pipeline(
                 "text2text-generation",
                 model=model,
@@ -46,7 +46,7 @@ class templates:
         
         max_length = kwargs.get("max_length", 60)
         
-        if pipe is not None:
+        if pipe is None:
             pipe = pipeline(
                 "text2text-generation",
                 model=model,

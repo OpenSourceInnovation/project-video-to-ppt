@@ -63,7 +63,7 @@ class templates:
         top_p = kwargs.get("top_p", 0.95)
         repetition_penalty = kwargs.get("repetition_penalty", 1.15)
         
-        if pipe is not None:
+        if pipe is None:
             pipe = pipeline(
                 "text2text-generation",
                 model=model,
@@ -88,7 +88,7 @@ class templates:
         top_p = kwargs.get("top_p", 0.95)
         repetition_penalty = kwargs.get("repetition_penalty", 1.15)
         
-        if pipe is not None:
+        if pipe is None:
             pipe = pipeline(
                 "text2text-generation",
                 model=model,
