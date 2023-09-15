@@ -14,6 +14,9 @@ VIDEO_ID    =   ""
 OUT_PPT_NAME=   PPTX_DEST
 NO_IMAGES   =   False
 QUESTIONS   =   5
+SUMMARIZER  =   None
+TITLEGEN    =   None
+MODEL       =   None
 
 def questionMode():
     from langchain.vectorstores import Chroma
@@ -195,19 +198,14 @@ def gradio_Interface():
     )
     app.launch()
     
-def run():
+def run(o_summarizer, o_title, o_model):
     info("Loading modules..")
     from langchain.chains.summarize import load_summarize_chain
-    # from langchain.vectorstores import Chroma
-    # from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-    # from langchain.chains import RetrievalQA
-    # from langchain.llms import HuggingFacePipeline
     from langchain.docstore.document import Document
     from rich.progress import track
 
     import utils.markdown as md
     # from models.lamini import lamini as model
-    from models.gpt_3 import templates, Model
     from utils.marp_wrapper import marp
     from utils.ppt import generate_ppt
     from utils.subtitles import subs
@@ -222,15 +220,6 @@ def run():
     # initialize video
     vid = video(VIDEO_ID, f"{OUTDIR}/vid-{VIDEO_ID}")
     vid.download()
-        
-    # # initialize model (lamini)
-    # llm_model = model
-    # llm = llm_model.load_model(
-    #         max_length=400,
-    #         temperature=0,
-    #         top_p=0.95,
-    #         repetition_penalty=1.15
-    # )
     
     # slice subtitle and chunk them 
     # to CHUNK_SIZE based on chapters
@@ -247,10 +236,8 @@ def run():
     if NO_CHAPTERS:
         chunker = subs(VIDEO_ID)
         chunks = chunker.getSubsList(size=CHUNK_SIZE)
-        # model_tmplts = llm_model.templates()
-        model_tmplts = templates()
-        summarizer = model_tmplts.ChunkSummarizer
-        title_gen = model_tmplts.ChunkTitle
+        summarizer = o_summarizer
+        title_gen = o_title
         
         for chunk in track(chunks, description="(processing chunks) Summarizing.."):
             summary = summarizer(chunk[0])
@@ -267,8 +254,7 @@ def run():
     else:
         raw_chapters = vid.getChapters(f"{YT_CHAPTER_ENDPOINT}{VIDEO_ID}")
         chunk_dict = ChunkByChapters(raw_chapters, raw_subs, CHUNK_SIZE)
-        m = Model
-        llm = m.model()
+        llm = o_model
         chain = load_summarize_chain(llm, chain_type="stuff")
             # TODO: ( use refine chain type to summarize all chapters )
         img_hook = False
@@ -322,6 +308,7 @@ if __name__ == "__main__":
     optparser.add_argument("--no-chapters", dest="no_chapters", action="store_true")
     optparser.add_argument("--questions-mode", dest="qm", action="store_true")
     optparser.add_argument("--gui-web", dest="gw", action="store_true")
+    optparser.add_argument("--use-model", dest="target_model", help="Set model to use (gpt3, lamini, bart) default: lamini")
     
     opts = optparser.parse_args()
     
@@ -349,6 +336,54 @@ if __name__ == "__main__":
         gradio_Interface()
         exit()
     
+    if opts.target_model:
+        allowed_model = ["lamini", "gpt3", "bart"]
+        if opts.target_model in allowed_model:
+            # check if model initalized
+            if SUMMARIZER != None or TITLEGEN != None:
+                logger.warn("Looks like model already initialized..")
+                logger.warn(f"skipping initializing f{opts.target_model}")
+            
+            # stage load models
+            useropt = opts.target_model
+            
+            if useropt == "lamini":
+                from models.lamini import templates
+                t = templates()
+                SUMMARIZER = t.ChunkSummarizer
+                TITLEGEN   = t.ChunkTitle
+                MODEL      = t.model()
+            
+            if useropt == "gpt3":
+                # GPT 3 requires API key
+                from models.gpt_3 import templates
+                t = templates()
+                SUMMARIZER = t.ChunkSummarizer
+                TITLEGEN = t.ChunkTitle
+                MODEL    = t.model()
+            
+            if useropt == "bart":
+                from models.distilbart_cnn_12_6 import templates as summary_template
+                from models.t5_small_medium_title_generation import templates as title_template
+                
+                # loads two models
+                s = summary_template()
+                t = title_template()
+                
+                SUMMARIZER = s.ChunkSummarizer
+                TITLEGEN = t.ChunkTitle
+                MODEL = s.model()
+                
+        else:
+            raise Exception("Unrecognised Model")
+    else:
+        # default to offline model
+        from models.lamini import templates
+        t = templates()
+        SUMMARIZER = t.ChunkSummarizer
+        TITLEGEN   = t.ChunkTitle
+        MODLE = t.model()
+    
     if not os.path.exists(OUTDIR):
         os.mkdir(OUTDIR)
         os.mkdir(OUTEXTRA)
@@ -356,4 +391,5 @@ if __name__ == "__main__":
     if not os.path.exists(OUTEXTRA):
         os.mkdir(OUTEXTRA)
     
-    run()
+    
+    run(SUMMARIZER, TITLEGEN, MODEL)
