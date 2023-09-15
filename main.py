@@ -44,7 +44,7 @@ def questionMode():
     )
     
     qa = RetrievalQA.from_chain_type(
-        llm=llm, chain_type="map_reduce", retriever=retriver
+        llm=llm, chain_type="stuff", retriever=retriver
     )
     
     def interface(msg, history):
