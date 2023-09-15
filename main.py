@@ -48,8 +48,8 @@ def questionMode():
     )
     
     def interface(msg, history):
-        res = qa(msg)
-        return str(res['result'])
+        res = qa.run(msg)
+        return str(res)
     
     ui = gr.ChatInterface(
         fn=interface,
