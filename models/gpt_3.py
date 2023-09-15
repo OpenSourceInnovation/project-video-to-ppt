@@ -52,7 +52,7 @@ class templates:
         return FT
     def ChunkSummarizer(self, text):
         instruction=dedent("""\
-            Create a summary of the text below. The summary should be in 100-200 words.
+            Create a summary of the text below. The summary should be in 150 words.
             """)
         sys_msg = SystemMessage(content=instruction)
         messages = [

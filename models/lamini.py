@@ -47,36 +47,57 @@ class lamini:
         
         llm = HuggingFacePipeline(pipeline=pipe)
         return llm
+
+class templates:
+    def __init__(self) -> None:
+        self.summaryPipe = None
+        self.TitlePipe = None
     
-    class templates:
+    def ChunkSummarizer(self, text, custom_instruction: str =None, **kwargs):
+        default_instruction = "generate a perfect title for the following text in 6 words: "
+        instructions = custom_instruction if custom_instruction != None else default_instruction
+        pipe = self.summaryPipe
         
-        def summarize(self, text):
-            instructions = "summarize for better understanding: "
+        max_length = kwargs.get("max_length", 400)
+        temperature = kwargs.get("temperature", 0)
+        top_p = kwargs.get("top_p", 0.95)
+        repetition_penalty = kwargs.get("repetition_penalty", 1.15)
+        
+        if pipe is not None:
             pipe = pipeline(
                 "text2text-generation",
                 model=model,
                 tokenizer=tokenizer,
-                max_length=400,
+                max_length=max_length,
                 generation_config=gen_config,
-                temperature=0,
-                top_p=0.95,
-                repetition_penalty=1.15
+                temperature=temperature,
+                top_p=top_p,
+                repetition_penalty=repetition_penalty
             )
-            return pipe(instructions + text)[0]["generated_text"].replace("-", "\n-")
         
-        def generate_title(self, text):
-            instructions = "generate a perfect title for the following text in 6 words: "
+        return pipe(instructions + text)[0]["generated_text"]
+    
+    
+    def ChunkTitle(self, text, custom_instruction: str =None, **kwargs):
+        default_instruction = "generate a perfect title for the following text in 6 words: "
+        instructions = custom_instruction if custom_instruction != None else default_instruction
+        pipe = self.summaryPipe
         
+        max_length = kwargs.get("max_length", 60)
+        temperature = kwargs.get("temperature", 0)
+        top_p = kwargs.get("top_p", 0.95)
+        repetition_penalty = kwargs.get("repetition_penalty", 1.15)
+        
+        if pipe is not None:
             pipe = pipeline(
                 "text2text-generation",
                 model=model,
                 tokenizer=tokenizer,
-                max_length=60,
+                max_length=max_length,
                 generation_config=gen_config,
-                temperature=0,
-                top_p=0.95,
-                repetition_penalty=1.15
+                temperature=temperature,
+                top_p=top_p,
+                repetition_penalty=repetition_penalty
             )
         
-            return pipe(instructions + text)[0]["generated_text"]
-        
+        return pipe(instructions + text)[0]["generated_text"]

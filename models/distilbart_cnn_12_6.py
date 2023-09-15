@@ -45,3 +45,18 @@ def summarizePipeline(text):
     )
     
     return pipe(text)[0]["summary_text"]
+
+class templates:
+    def __init__(self):
+        pass
+    
+    @staticmethod
+    def ChunkSummarizer(text):
+        return summarize(text)
+    
+    @staticmethod
+    def ChunkTitle(text, ovveride):
+        if ovveride:
+            return summarize(text)
+        else:
+            raise Exception("Model only trained for summarization")

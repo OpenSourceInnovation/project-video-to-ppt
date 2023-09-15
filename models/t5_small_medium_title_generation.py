@@ -1,4 +1,3 @@
-import nltk
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 
@@ -28,3 +27,17 @@ def t5model(prompt: str) -> str:
     )[0]
     
     return decoded_output
+
+class templates:
+    def __init__(self):
+        pass
+    @staticmethod
+    def ChunkSummarizer(text, ovveride=False):
+        if ovveride:
+            return t5model(text)
+        else:
+            raise Exception("Model only trained for title generation")
+    
+    @staticmethod
+    def ChunkTitle(text):
+        return t5model(text)

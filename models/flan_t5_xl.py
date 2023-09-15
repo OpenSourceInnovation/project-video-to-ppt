@@ -13,4 +13,46 @@ pipe = pipeline(
     max_length=512,
 )
 
-local_llm = HuggingFacePipeline(Pipeline=pipe)
+class templates:
+    """
+    Untested Model
+    """
+    def __init__(self) -> None:
+        self.summaryPipe = None
+        self.TitlePipe = None
+    
+    def ChunkSummarizer(self, text, custom_instruction: str =None, **kwargs):
+        default_instruction = "generate a perfect title for the following text in 6 words: "
+        instructions = custom_instruction if custom_instruction != None else default_instruction
+        pipe = self.summaryPipe
+        
+        max_length = kwargs.get("max_length", 400)
+        
+        if pipe is not None:
+            pipe = pipeline(
+                "text2text-generation",
+                model=model,
+                tokenizer=tokenizer,
+                max_length=max_length,
+            )
+        
+        return pipe(instructions + text)[0]["generated_text"]
+    
+    
+    def ChunkTitle(self, text, custom_instruction: str =None, **kwargs):
+        default_instruction = "generate a perfect title for the following text in 6 words: "
+        instructions = custom_instruction if custom_instruction != None else default_instruction
+        pipe = self.summaryPipe
+        
+        max_length = kwargs.get("max_length", 60)
+        
+        if pipe is not None:
+            pipe = pipeline(
+                "text2text-generation",
+                model=model,
+                tokenizer=tokenizer,
+                max_length=max_length,
+            )
+        
+        return pipe(instructions + text)[0]["generated_text"]
+
