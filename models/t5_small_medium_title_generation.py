@@ -41,3 +41,7 @@ class templates:
     @staticmethod
     def ChunkTitle(text):
         return t5model(text)
+    
+    @staticmethod
+    def model():
+        return t5model

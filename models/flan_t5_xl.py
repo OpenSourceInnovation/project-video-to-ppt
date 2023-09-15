@@ -55,4 +55,8 @@ class templates:
             )
         
         return pipe(instructions + text)[0]["generated_text"]
+    
+    @staticmethod
+    def model():
+        return pipe
 

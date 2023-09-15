@@ -101,3 +101,8 @@ class templates:
             )
         
         return pipe(instructions + text)[0]["generated_text"]
+    
+    @staticmethod
+    def model():
+        m = lamini()
+        return m.load_model()

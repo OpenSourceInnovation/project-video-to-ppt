@@ -60,3 +60,7 @@ class templates:
             return summarize(text)
         else:
             raise Exception("Model only trained for summarization")
+    
+    @staticmethod
+    def model():
+        return summarize

@@ -100,3 +100,6 @@ class templates:
             
     def Title():
         pass
+    
+    def model(self):
+        return self.llm
