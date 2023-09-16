@@ -27,7 +27,7 @@ python3 main.py -v <video_id> --no-chapers -o out.pdf
 
 #### GUI
 
-Project has integration with gradio to provide a GUI and clean interface to the project to startup.
+Project has integration with gradio to provide a GUI and clean interface tog the project to startup.
 
 ```bash
 python3 main.py -v <video_id> -o out.pdf --gui-web
