@@ -2,13 +2,11 @@ import argparse
 import datetime
 import os
 import sys
-import gradio as gr
 from signal import SIGINT, signal
-from utils.log import debug, info, logger, breakPoint as bc
+import gradio as gr
+from utils.log import debug, info, logger
 
-import requests
-
-from constants import *
+from constants import * #pylint: disable=wildcard-import,unused-wildcard-import
 
 CHUNK_SIZE = 512
 VIDEO_ID = ""
@@ -21,10 +19,12 @@ MODEL = None
 
 
 def questionMode():
+    """Question Model
+        Starts a question answer chatbot interface with GRADIO interface for video ID
+    """
     from langchain.vectorstores import Chroma
     from langchain.embeddings import HuggingFaceInstructEmbeddings
     from langchain.chains import RetrievalQA
-    from rich.progress import track
 
     from models.lamini import lamini as model, device
     from utils.subtitles import getSubsText
@@ -53,7 +53,7 @@ def questionMode():
         llm=llm, chain_type="stuff", retriever=retriver
     )
 
-    def interface(msg, history):
+    def interface(msg, history): # pylint: disable=unused-argument
         res = qa.run(msg)
         return str(res)
 
@@ -69,7 +69,20 @@ def questionMode():
 def gradio_run(
         video_id, chunk_size: int,
         no_images: bool, no_chapters: bool, out_type="pdf"):
+    """GUI interface for video to ppt with gradio
 
+    Args:
+        video_id (_type_): youtube video ID
+        chunk_size (int): chunks are part of 
+                          video subtitles divded into given fixed length 
+                          ( in no chapter mode one chunk = one page/slide)
+        no_images (bool): do not extract or place images in slides
+        no_chapters (bool): do not create slides for every video chapters
+        out_type (str, optional): Output file type 
+                 (pptx, pdf, html presentation interface). 
+                 Defaults to "pdf".
+
+    """
     global VIDEO_ID
     global CHUNK_SIZE
     global NO_IMAGES
@@ -88,7 +101,7 @@ def gradio_run(
     from rich.progress import track
 
     import utils.markdown as md
-    from models.lamini import lamini as model, templates
+    from models.lamini import lamini as model, templates as templatesForGr
     from utils.marp_wrapper import marp
     from utils.ppt import generate_ppt
     from utils.subtitles import subs
@@ -126,7 +139,7 @@ def gradio_run(
     if NO_CHAPTERS:
         chunker = subs(VIDEO_ID)
         chunks = chunker.getSubsList(size=CHUNK_SIZE)
-        model_tmplts = templates()
+        model_tmplts = templatesForGr()
         summarizer = model_tmplts.ChunkSummarizer
         title_gen = model_tmplts.ChunkTitle
 
@@ -197,6 +210,8 @@ def gradio_run(
 
 
 def gradio_Interface():
+    """Gradion interface starter for video to file
+    """
     app = gr.Interface(
         fn=gradio_run,
         inputs=[
@@ -226,6 +241,13 @@ def gradio_Interface():
 
 
 def run(o_summarizer, o_title, o_model):
+    """General command line interface function
+
+    Args:
+        o_summarizer: summarization method/function
+        o_title: title generation method/function
+        o_model: model/llm interface
+    """
     info("Loading modules..")
     from langchain.chains.summarize import load_summarize_chain
     from langchain.docstore.document import Document
@@ -318,7 +340,9 @@ def run(o_summarizer, o_title, o_model):
 
 
 def exithandle(_signal, _frame):
-    logger.warning(f"Exiting... | {str(_signal)} | {str(_frame)}")
+    """Capture exit signals
+    """
+    logger.warning("Exiting... | %s | %s", str(_signal), str(_frame))
     sys.exit(0)
 
 
@@ -374,8 +398,8 @@ if __name__ == "__main__":
         if opts.target_model in allowed_model:
             # check if model initalized
             if SUMMARIZER is not None or TITLEGEN is not None:
-                logger.warn("Looks like model already initialized..")
-                logger.warn(f"skipping initializing f{opts.target_model}")
+                logger.warning("Looks like model already initialized..")
+                logger.warning("skipping initializing %s", opts.target_model)
 
             # stage load models
             useropt = opts.target_model
@@ -408,7 +432,8 @@ if __name__ == "__main__":
                 MODEL = s.model()
 
         else:
-            raise Exception("Unrecognised Model")
+            logger.critical("Unrecognised Model %s", opts.target_model)
+            sys.exit(1)
     else:
         # default to offline model
         from models.lamini import templates

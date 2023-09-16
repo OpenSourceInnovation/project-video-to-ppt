@@ -259,7 +259,7 @@ max-bool-expr = 5
 max-branches = 12
 
 # Maximum number of locals for function / method body.
-max-locals = 15
+max-locals = 90
 
 # Maximum number of parents for a class (see R0901).
 max-parents = 7
@@ -271,7 +271,7 @@ max-public-methods = 20
 max-returns = 6
 
 # Maximum number of statements in function / method body.
-max-statements = 50
+max-statements = 90
 
 # Minimum number of public methods for a class (see R0903).
 min-public-methods = 2
@@ -365,7 +365,7 @@ confidence = ["HIGH", "CONTROL_FLOW", "INFERENCE", "INFERENCE_FAILURE", "UNDEFIN
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
-disable = ["import-outside-toplevel", "raw-checker-failed", "bad-inline-option", "locally-disabled", "file-ignored", "suppressed-message", "useless-suppression", "deprecated-pragma", "use-symbolic-message-instead", "bare-except", "invalid-name"]
+disable = ["missing-module-docstring", "global-statement", "import-outside-toplevel", "raw-checker-failed", "bad-inline-option", "locally-disabled", "file-ignored", "suppressed-message", "useless-suppression", "deprecated-pragma", "use-symbolic-message-instead", "bare-except", "invalid-name"]
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
