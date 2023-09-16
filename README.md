@@ -1,6 +1,6 @@
 # Project `Video to PPT`
 
-A project to convert a video data to a PPT/PPTX with different slides covering summary of the video.
+A project to create slides on youtube videos with LLM's
 
 ## Getting Started
 
@@ -33,6 +33,12 @@ Project has integration with gradio to provide a GUI and clean interface tog the
 python3 main.py -v <video_id> -o out.pdf --gui-web
 ```
 
+##### Question Mode
+
+```bash
+python3 main.py -v <video_id> -o out.pdf --questions-mode
+```
+
 ```cmd
 usage: video to ppt (dev) [-h] [-v VIDEO_ID] [--chunk-size CHUNK_SIZE] [-o OUT_PPT_NAME] [--no-images] [--no-chapters] [--questions-mode]
                           [--gui-web] [--use-model TARGET_MODEL]
@@ -55,7 +61,16 @@ options:
 
 ## How it works
 
+### Video To PPT
+
 for any given video, the project will generate a summary of the video and will create a PPT/PPTX with different slides covering the summary of the video.
 
 The video subtitles are fetched from youtube and fed to the LLM's to generate the summary of the video then the summary is used to create the PPT/PPTX with marp.
+
+### Video TO QA
+
+QA interface uses vectorstores to quickly search for the related data and fed to the LLM's to generate the answer for the question.
+
+![Alt text](images/vector_stores.png)
+> image source & refer about vector stores: [lanchain.com](https://python.langchain.com/docs/modules/data_connection/vectorstores/)
 
