@@ -155,7 +155,6 @@ def gradio_run(
         raw_chapters = vid.getChapters(f"{YT_CHAPTER_ENDPOINT}{VIDEO_ID}")
         chunk_dict = ChunkByChapters(raw_chapters, raw_subs, CHUNK_SIZE)
         chain = load_summarize_chain(llm, chain_type="stuff")
-        # TODO: ( use refine chain type to summarize all chapters )
         img_hook = False
         for title, subchunks in track(
                 chunk_dict.items(), description="(processing chunks) Summarizing.."):
@@ -279,7 +278,6 @@ def run(o_summarizer, o_title, o_model):
         chunk_dict = ChunkByChapters(raw_chapters, raw_subs, CHUNK_SIZE)
         llm = o_model
         chain = load_summarize_chain(llm, chain_type="stuff")
-        # TODO: ( use refine chain type to summarize all chapters )
         img_hook = False
         for title, subchunks in track(
                 chunk_dict.items(), description="(processing chunks) Summarizing.."):
