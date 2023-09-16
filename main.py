@@ -70,6 +70,12 @@ def gradio_run(
         video_id, chunk_size: int,
         no_images: bool, no_chapters: bool, out_type="pdf"):
 
+    global VIDEO_ID
+    global CHUNK_SIZE
+    global NO_IMAGES
+    global NO_CHAPTERS
+    global OUT_PPT_NAME
+
     VIDEO_ID = video_id
     CHUNK_SIZE = chunk_size
     NO_IMAGES = no_images
@@ -82,7 +88,7 @@ def gradio_run(
     from rich.progress import track
 
     import utils.markdown as md
-    from models.lamini import lamini as model
+    from models.lamini import lamini as model, templates
     from utils.marp_wrapper import marp
     from utils.ppt import generate_ppt
     from utils.subtitles import subs
@@ -120,9 +126,9 @@ def gradio_run(
     if NO_CHAPTERS:
         chunker = subs(VIDEO_ID)
         chunks = chunker.getSubsList(size=CHUNK_SIZE)
-        model_tmplts = llm_model.templates()
-        summarizer = model_tmplts.summarize
-        title_gen = model_tmplts.generate_title
+        model_tmplts = templates()
+        summarizer = model_tmplts.ChunkSummarizer
+        title_gen = model_tmplts.ChunkTitle
 
         # title Photo
         first_pic = str(datetime.timedelta(seconds=chunks[0][1]))
