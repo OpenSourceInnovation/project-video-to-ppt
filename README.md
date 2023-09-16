@@ -14,8 +14,6 @@ Project uses both Local LLM's and GPT 3.5 turbo api to generate the text from th
 apt install git -y
 git clone https://github.com/SaicharanKandukuri/project-video-to-ppt
 cd project-video-to-ppt
-python3 -m venv proj
-source proj/bin/activate
 pip install -r requirements.txt
 ```
 
