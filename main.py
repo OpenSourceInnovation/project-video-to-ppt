@@ -131,7 +131,9 @@ def gradio_run(
         out.add_page(md.h1(VIDEO_ID), md.image(url=img_name))
         out.marp_end()
 
-        for chunk in track(chunks, description="(processing chunks) Summarizing.."):
+        for chunk in track(
+                chunks,
+                description="(processing chunks) Summarizing.."):
             summary = summarizer(chunk[0])[
                 0]["generated_text"].replace("-", "\n-")
             title = title_gen(chunk[0])[0]["generated_text"]
@@ -139,7 +141,7 @@ def gradio_run(
             heading = md.h2 if len(title) < 40 else md.h3
             out.add_page(heading(title), summary)
 
-            if not NO_IMAGES and len(summary+title) < 270:
+            if not NO_IMAGES and len(summary + title) < 270:
                 timestamp = str(datetime.timedelta(seconds=chunk[1]))
                 imgName = f"vid-{VIDEO_ID}_{timestamp}.png"
                 imgPath = f"{PNG_DEST}/{imgName}"
@@ -154,7 +156,8 @@ def gradio_run(
         chain = load_summarize_chain(llm, chain_type="stuff")
         # TODO: ( use refine chain type to summarize all chapters )
         img_hook = False
-        for title, subchunks in track(chunk_dict.items(), description="(processing chunks) Summarizing.."):
+        for title, subchunks in track(
+                chunk_dict.items(), description="(processing chunks) Summarizing.."):
             # Typecase subchunks to Document for every topic
             # get summary for every topic with stuff/refine chain
             # add to final summary
@@ -163,13 +166,14 @@ def gradio_run(
             docs = [Document(page_content=t[0]) for t in subchunks[0]]
             summary = chain.run(docs)
 
-            if img_hook == False:
+            if not img_hook:
                 ts = str(datetime.timedelta(seconds=subchunks[0][1][0]))
                 img_path = f"{PNG_DEST}/vid-{VIDEO_ID}_{ts}.png"
                 vid.getframe(ts, img_path)
                 if os.path.exists(img_path):
-                    # if summary is long ignore images for better page and no clipping
-                    if len(summary+title) < 270:
+                    # if summary is long ignore images for better page and no
+                    # clipping
+                    if len(summary + title) < 270:
                         out.add_body(md.image(
                             img_path.replace(f"{OUTEXTRA}/", ""),
                             align="left",
@@ -191,17 +195,27 @@ def gradio_Interface():
         fn=gradio_run,
         inputs=[
             "text",
-            gr.Slider(300, 2000, 1, label="Chunk Size",
-                      info="More chunk size = longer text & shorter numbber of slides"),
+            gr.Slider(
+                300,
+                2000,
+                1,
+                label="Chunk Size",
+                info="More chunk size = longer text & shorter numbber of slides"),
             gr.Checkbox(
-                label="No Images", info="Don't keep images in output ( gives more spaces for larger text)"),
-            gr.Checkbox(label="No Chapters",
-                        info="Don't use chapter based chunking"),
-            gr.Dropdown(["pptx", "pdf", "html"], value="pptx",
-                        label="file format", info="which file format to generte.")
-        ],
-        outputs="file"
-    )
+                label="No Images",
+                info="Don't keep images in output ( gives more spaces for larger text)"),
+            gr.Checkbox(
+                label="No Chapters",
+                info="Don't use chapter based chunking"),
+            gr.Dropdown(
+                [
+                    "pptx",
+                    "pdf",
+                    "html"],
+                value="pptx",
+                label="file format",
+                info="which file format to generte.")],
+        outputs="file")
     app.launch()
 
 
@@ -245,11 +259,13 @@ def run(o_summarizer, o_title, o_model):
         summarizer = o_summarizer
         title_gen = o_title
 
-        for chunk in track(chunks, description="(processing chunks) Summarizing.."):
+        for chunk in track(
+                chunks,
+                description="(processing chunks) Summarizing.."):
             summary = summarizer(chunk[0])
             title = title_gen(chunk[0])
 
-            if not NO_IMAGES and len(summary+title) < 270:
+            if not NO_IMAGES and len(summary + title) < 270:
                 timestamp = str(datetime.timedelta(seconds=chunk[1]))
                 imgPath = f"{PNG_DEST}/vid-{VIDEO_ID}_{timestamp}.png"
                 vid.getframe(timestamp, imgPath)
@@ -264,7 +280,8 @@ def run(o_summarizer, o_title, o_model):
         chain = load_summarize_chain(llm, chain_type="stuff")
         # TODO: ( use refine chain type to summarize all chapters )
         img_hook = False
-        for title, subchunks in track(chunk_dict.items(), description="(processing chunks) Summarizing.."):
+        for title, subchunks in track(
+                chunk_dict.items(), description="(processing chunks) Summarizing.."):
             # Typecase subchunks to Document for every topic
             # get summary for every topic with stuff/refine chain
             # add to final summary
@@ -273,13 +290,14 @@ def run(o_summarizer, o_title, o_model):
             docs = [Document(page_content=t[0]) for t in subchunks[0]]
             summary = chain.run(docs)
 
-            if img_hook == False:
+            if not img_hook:
                 ts = str(datetime.timedelta(seconds=subchunks[0][1][0]))
                 img_path = f"{PNG_DEST}/vid-{VIDEO_ID}_{ts}.png"
                 vid.getframe(ts, img_path)
                 if os.path.exists(img_path):
-                    # if summary is long ignore images for better page and no clipping
-                    if len(summary+title) < 270:
+                    # if summary is long ignore images for better page and no
+                    # clipping
+                    if len(summary + title) < 270:
                         out.add_body(md.image(
                             img_path.replace(f"{OUTEXTRA}/", ""),
                             align="left",
@@ -304,8 +322,7 @@ if __name__ == "__main__":
 
     optparser = argparse.ArgumentParser(
         prog="video to ppt (dev)",
-        description="Convert Youtube videos to PPT/pdf with large language models"
-    )
+        description="Convert Youtube videos to PPT/pdf with large language models")
     optparser.add_argument(
         "-v", "--video", dest="video_id", help="YouTube video ID")
     optparser.add_argument("--chunk-size", dest="chunk_size", type=int)
@@ -316,8 +333,10 @@ if __name__ == "__main__":
         "--no-chapters", dest="no_chapters", action="store_true")
     optparser.add_argument("--questions-mode", dest="qm", action="store_true")
     optparser.add_argument("--gui-web", dest="gw", action="store_true")
-    optparser.add_argument("--use-model", dest="target_model",
-                           help="Set model to use (gpt3, lamini, bart) default: lamini")
+    optparser.add_argument(
+        "--use-model",
+        dest="target_model",
+        help="Set model to use (gpt3, lamini, bart) default: lamini")
 
     opts = optparser.parse_args()
 
@@ -349,7 +368,7 @@ if __name__ == "__main__":
         allowed_model = ["lamini", "gpt3", "bart"]
         if opts.target_model in allowed_model:
             # check if model initalized
-            if SUMMARIZER != None or TITLEGEN != None:
+            if SUMMARIZER is not None or TITLEGEN is not None:
                 logger.warn("Looks like model already initialized..")
                 logger.warn(f"skipping initializing f{opts.target_model}")
 

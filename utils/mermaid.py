@@ -1,5 +1,6 @@
 from utils.utils import Popen
 
+
 def mermaidImage(mmdFile: str, out="out.svg"):
     """Convert a mermaid file to an image
 

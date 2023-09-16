@@ -1,6 +1,10 @@
-import subprocess, os, requests, json
+import subprocess
+import os
+import requests
+import json
 from utils.log import info
 from utils.subtitles import subs
+
 
 def Popen(cmd: list) -> str:
     """Run a command and return the output as a string
@@ -11,18 +15,22 @@ def Popen(cmd: list) -> str:
     Returns:
         str: The output of the command
     """
-    return subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE).stdout.read().strip().decode('utf-8')
+    return subprocess.Popen(
+        cmd,
+        shell=False,
+        stdout=subprocess.PIPE).stdout.read().strip().decode('utf-8')
+
 
 class video:
-    def __init__(self,id, path):
+    def __init__(self, id, path):
         self.path = path
         self.url = "https://youtu.be/" + id
         self.video_id = id
-        
+
         # check if directory exists
         if not os.path.exists(self.path.split("/")[-1]):
             os.mkdir(self.path.split("/")[-1])
-    
+
     def download(self):
         if os.path.exists(f"{self.path}.webm"):
             info(f"{self.path}.webm already exists, skipping download")
@@ -34,47 +42,47 @@ class video:
         #     )
         # )
         os.system(f"yt-dlp {self.url} -o {self.path}")
-    
+
     def getframe(self, timestamp, out=os.curdir):
         filename = out
         if os.path.exists(filename):
             info(f"{filename} already exists, skipping frame")
             return
-        
+
         info(f"Getting frame at {timestamp}")
         (
             Popen(
                 [
-                    "ffmpeg", 
+                    "ffmpeg",
                     "-hide_banner",
                     "-loglevel", "panic",
-                    "-ss", timestamp, 
-                    "-i", f"{self.path}.webm", 
-                    "-vframes", "1", 
+                    "-ss", timestamp,
+                    "-i", f"{self.path}.webm",
+                    "-vframes", "1",
                     filename
                 ]
             )
         )
-    
+
     def getAudio(self, out="out.mp3"):
         info("Getting audio...")
         (
             Popen(
                 [
-                    "ffmpeg", 
+                    "ffmpeg",
                     "-hide_banner",
                     "-loglevel", "panic",
-                    "-i", f"{self.path}.webm", 
-                    "-vn", 
-                    "-ar", "44100", 
-                    "-ac", "2", 
-                    "-ab", "192K", 
-                    "-f", "mp3", 
+                    "-i", f"{self.path}.webm",
+                    "-vn",
+                    "-ar", "44100",
+                    "-ac", "2",
+                    "-ab", "192K",
+                    "-f", "mp3",
                     out
                 ]
             )
         )
-    
+
     def getChapters(self, endpoint: str) -> list:
         """return the chapters of the video
 
@@ -87,7 +95,7 @@ class video:
         res = requests.get(f"{endpoint}")
         chapters = res.json()['items'][0]['chapters']['chapters']
         return chapters
-    
+
     def getSubtitles(self):
         """return the raw subtitles
 

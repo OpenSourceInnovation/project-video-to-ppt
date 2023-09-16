@@ -1,8 +1,10 @@
-import subprocess, os
+import subprocess
+import os
+
 
 def Popen(cmd: list) -> str:
     """Run a command and return the output as a string
-    
+
     - example: print(Popen(["ls", "-l"]))
 
     Args:
@@ -11,7 +13,11 @@ def Popen(cmd: list) -> str:
     Returns:
         str: The output of the command
     """
-    return subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE).stdout.read().strip().decode('utf-8')
+    return subprocess.Popen(
+        cmd,
+        shell=False,
+        stdout=subprocess.PIPE).stdout.read().strip().decode('utf-8')
+
 
 def getfilesR(path: str, sorted=False) -> list:
     """Get all files in a directory recursively
@@ -23,14 +29,14 @@ def getfilesR(path: str, sorted=False) -> list:
     Returns:
         list: The list of files
     """
-   
+
     files = []
     # include depth
     for r, d, f in os.walk(path):
         for file in f:
             files.append(os.path.join(r, file))
-    
+
     if sorted:
         files.sort()
-    
+
     return files
