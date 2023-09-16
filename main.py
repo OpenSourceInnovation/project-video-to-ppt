@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import os
+import sys
 import gradio as gr
 from signal import SIGINT, signal
 from utils.log import debug, info, logger, breakPoint as bc
@@ -112,7 +113,7 @@ def gradio_run(
 
     if raw_subs is None:
         logger.critical("No subtitles found, exiting..")
-        exit()
+        sys.exit(0)
 
     info(f"got {len(raw_subs)} length subtitles")
 
@@ -249,7 +250,7 @@ def run(o_summarizer, o_title, o_model):
 
     if raw_subs is None:
         logger.critical("No subtitles found, exiting..")
-        exit()
+        sys.exit(0)
 
     info(f"got {len(raw_subs)} length subtitles")
 
@@ -314,7 +315,7 @@ def run(o_summarizer, o_title, o_model):
 
 def exithandle(_signal, _frame):
     logger.warning(f"Exiting... | {str(_signal)} | {str(_frame)}")
-    exit()
+    sys.exit(0)
 
 
 if __name__ == "__main__":
@@ -342,7 +343,7 @@ if __name__ == "__main__":
 
     if opts.video_id is None:
         print("Please provide a YouTube video ID")
-        exit()
+        sys.exit(0)
     else:
         VIDEO_ID = opts.video_id
 
@@ -358,11 +359,11 @@ if __name__ == "__main__":
 
     if opts.qm is True:
         questionMode()
-        exit()
+        sys.exit(0)
 
     if opts.gw is True:
         gradio_Interface()
-        exit()
+        sys.exit(0)
 
     if opts.target_model:
         allowed_model = ["lamini", "gpt3", "bart"]
