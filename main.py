@@ -65,6 +65,32 @@ def questionMode():
 
     ui.launch()
 
+def gradio_digram_gen():
+    import tempfile
+    from utils.mermaid import mermaidImage
+    from models.gpt_3 import templates as gpt_templates
+    
+    t = gpt_templates()
+    tf = tempfile.NamedTemporaryFile(mode="w", suffix=".mmd", delete=False)
+    diagram_gen = t.DiagramGenerator
+    
+    def interface(text):
+        res = diagram_gen(text)
+        tf.write(res)
+        tf.close()
+        img = mermaidImage(tf.name)
+        return img
+    
+    app = gr.Interface(
+        title="MODE - DIGRAM GEN",
+        fn=interface,
+        inputs=[
+            "text"
+        ],
+        outputs="image"
+    )
+    
+    app.launch()
 
 def gradio_run(
         video_id, chunk_size: int,
@@ -213,6 +239,7 @@ def gradio_Interface():
     """Gradion interface starter for video to file
     """
     app = gr.Interface(
+        title="MODE - VIDEO to slides",
         fn=gradio_run,
         inputs=[
             "text",
@@ -224,7 +251,7 @@ def gradio_Interface():
                 info="More chunk size = longer text & shorter numbber of slides"),
             gr.Checkbox(
                 label="No Images",
-                info="Don't keep images in output ( gives more spaces for larger text)"),
+                info="Don't keep images in output - note: not all video have chapters "),
             gr.Checkbox(
                 label="No Chapters",
                 info="Don't use chapter based chunking"),
@@ -268,7 +295,8 @@ def run(o_summarizer, o_title, o_model):
 
     # initialize video
     vid = video(VIDEO_ID, f"{OUTDIR}/vid-{VIDEO_ID}")
-    vid.download()
+    if NO_IMAGES:
+        vid.download() # no need to download video when NO_IMAGES is set
 
     # slice subtitle and chunk them
     # to CHUNK_SIZE based on chapters
@@ -362,6 +390,7 @@ if __name__ == "__main__":
         "--no-chapters", dest="no_chapters", action="store_true")
     optparser.add_argument("--questions-mode", dest="qm", action="store_true")
     optparser.add_argument("--gui-web", dest="gw", action="store_true")
+    optparser.add_argument("--diagram-gen", dest="dg", action="store_true")
     optparser.add_argument(
         "--use-model",
         dest="target_model",
@@ -369,6 +398,13 @@ if __name__ == "__main__":
 
     opts = optparser.parse_args()
 
+    if opts.gw is True:
+        gradio_Interface()
+        sys.exit(0)
+    if opts.dg is True:
+        gradio_digram_gen()
+        sys.exit(0)
+    
     if opts.video_id is None:
         print("Please provide a YouTube video ID")
         sys.exit(0)
@@ -384,13 +420,11 @@ if __name__ == "__main__":
         NO_CHAPTERS = True
     if opts.no_images is True:
         NO_IMAGES = True
+    else:
+        NO_IMAGES = False
 
     if opts.qm is True:
         questionMode()
-        sys.exit(0)
-
-    if opts.gw is True:
-        gradio_Interface()
         sys.exit(0)
 
     if opts.target_model:

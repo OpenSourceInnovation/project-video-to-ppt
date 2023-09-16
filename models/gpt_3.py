@@ -28,6 +28,19 @@ class templates:
         # model
         m = Model()
         self.llm = m.model() if model is None else model
+    
+    def DiagramGenerator(self, text, promptFile="prompts/DiagramGenerationPrompt.txt"):
+        with open(promptFile, 'r') as f:
+            sys_prompt = f.read()
+
+        sys_prompt = sys_prompt + text
+        sys_msg = SystemMessage(content=sys_prompt)
+        messages = [
+            sys_msg,
+        ]
+
+        return self.llm(messages).content
+        
 
     def TopicMap(self, text) -> list:
         sys_msg = SystemMessage(content="You are a person creating a presentation\nYour task is to Organize the content into a clear and logical structure. Divide your content into sections or key points. Each section should have a specific purpose and flow naturally into the next. For any given input you will provide the output in the exact specified format below with no explanation or conversion\n\nExample Output:\n1. Introduction: \n1.1 - Definition and explanation of global warming \n1.2 - Importance and relevance of the topic \n\n2. Causes of Global Warming:\n2.1- Greenhouse effect and the role of greenhouse gases\n2.2- Human activities and their contribution to global warming\n2.3- Deforestation and its impact on climate change\n2.4- Fossil fuels and their role in increasing greenhouse gas emissions \n\n3. Effects of Global Warming:\n3.1- Rising global temperatures and extreme weather events\n3.2- Melting polar ice caps and rising sea levels\n3.3- Impact on ecosystems and biodiversity\n3.4- Threats to human health and well-being \n\n4. Mitigation and Adaptation Strategies:\n4.1- The need for reducing greenhouse gas emissions \n4.2- Transition to renewable energy sources \n4.3- Sustainable agriculture and land-use practices \n4.4- Conservation and preservation of forests \n4.5- Adapting to changing climate conditions \n\n6. Conclusion: \n6.1- Recap of key points \n6.2- Urgency for action on an individual and global level \n6.3- Call to action for the audience to take steps towards combating global warming")

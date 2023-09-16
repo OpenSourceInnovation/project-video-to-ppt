@@ -8,7 +8,7 @@ logging.basicConfig(
     datefmt="[%X]",
     handlers=[RichHandler(rich_tracebacks=True)],
 )
-
+logging.disable('DEBUG')
 logger = logging.getLogger("project-v-p")
 
 

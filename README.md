@@ -1,6 +1,10 @@
 # Project `Video to PPT`
 
-A project to convert a video data to a PPT/PPTX with different slides covering summary of the video.
+A project to experiment with LLM's generate to do tasks like
+
+- slide creation
+- Question Answer chatbot interface
+- Diagram Generation
 
 ## Getting Started
 
@@ -19,19 +23,16 @@ pip install -r requirements.txt
 
 ### Usage
 
-For basic command line usage
+For basic command line usage to generate PPT
 
 ```bash
-python3 main.py -v <video_id> --no-chapers -o out.pdf
+python3 main.py -v <video_id> --no-chapers
 ```
 
-#### GUI
+- `-v <video_id>` youtube video id ( in `https://youtu.be/PPZ0dQEIrTk?si=pRlTVjfTIzwqvChS` **PPZ0dQEIrTk** is the video id)
+- `--no-chapters` is recommended cause not all videos have chapters
 
-Project has integration with gradio to provide a GUI and clean interface tog the project to startup.
-
-```bash
-python3 main.py -v <video_id> -o out.pdf --gui-web
-```
+More options:
 
 ```cmd
 usage: video to ppt (dev) [-h] [-v VIDEO_ID] [--chunk-size CHUNK_SIZE] [-o OUT_PPT_NAME] [--no-images] [--no-chapters] [--questions-mode]
@@ -53,9 +54,41 @@ options:
                         Set model to use (gpt3, lamini, bart) default: lamini
 ```
 
-## How it works
+## GUI interfaces
+
+All the task have a seperate GUI for this time being.
+
+### Video To PPT
+
+```bash
+python3 main.py --gui-web
+```
+
+> Generates slides with video summary and convert to presentation or pdf
 
 for any given video, the project will generate a summary of the video and will create a PPT/PPTX with different slides covering the summary of the video.
 
 The video subtitles are fetched from youtube and fed to the LLM's to generate the summary of the video then the summary is used to create the PPT/PPTX with marp.
 
+### Video TO Question-Answer interface
+
+![Alt text](images/QAInterface.png)
+
+```bash
+python3 main.py -v VIDEO_ID --questions-mode
+```
+
+QA interface uses vectorstores to quickly search for the related data and fed to the LLM's to generate the answer for the question.
+
+![Alt text](images/vector_stores.png)
+> image source & refer about vector stores: [lanchain.com](https://python.langchain.com/docs/modules/data_connection/vectorstores/)
+
+### Diagram generation
+
+> Runs with GPT 3 for better reasoning capabilities
+
+```bash
+python3 main.py --diagram-gen
+```
+
+![Diagram Generation](images/diagram_interface.png)
