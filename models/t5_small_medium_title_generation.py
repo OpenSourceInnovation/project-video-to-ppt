@@ -5,6 +5,15 @@ tokenizer = AutoTokenizer.from_pretrained("fabiochiu/t5-small-medium-title-gener
 model = AutoModelForSeq2SeqLM.from_pretrained("fabiochiu/t5-small-medium-title-generation", device_map="cuda:0", torch_dtype=torch.float16)
     
 def t5model(prompt: str) -> str:
+    """
+    Generates a title for a given prompt using the T5 model.
+
+    Args:
+        prompt (str): The prompt for which a title needs to be generated.
+
+    Returns:
+        str: The generated title.
+    """
     inputs = tokenizer(
         ["summarize:" + prompt],
         return_tensors="pt",

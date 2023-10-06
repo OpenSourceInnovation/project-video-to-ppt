@@ -1,10 +1,26 @@
 import os
 
 
+import os
+
 def generate_ppt(
-        markdown_source,
-        output_name,
-        chromium_path="./chrome_sandbox") -> None:
+        markdown_source: str,
+        output_name: str,
+        chromium_path: str = "./chrome_sandbox") -> None:
+    """
+    Generates a PowerPoint presentation from a markdown file using Marp.
+
+    Args:
+        markdown_source (str): The path to the markdown file to be converted.
+        output_name (str): The desired name of the output PowerPoint file.
+        chromium_path (str, optional): The path to the Chromium browser executable. Defaults to "./chrome_sandbox".
+
+    Raises:
+        Exception: If Marp is not installed or if the markdown source file does not exist.
+
+    Returns:
+        None
+    """
     # check for marp
     if os.system("marp --version") != 0:
         raise Exception("Marp is not installed")

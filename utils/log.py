@@ -25,11 +25,16 @@ def debug(msg):
 
 
 def breakPoint():
-    """ A quick function to pause the program for debug or analysis
+    """A quick function to pause the program for debug or analysis.
 
-    take user input Y/N
-    if Y: break
-    else: continue"""
+    This function takes user input Y/N. If Y, the program continues. If N, the program exits.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
 
     print("Breakpoint: Press Y to continue, N to exit")
     user_input = input()

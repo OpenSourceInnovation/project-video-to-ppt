@@ -29,19 +29,19 @@ def image(
     size=None,
     setAsBackground=False,
 ):
-    """Summary
-    return markdown image syntax with marp options
+    """
+    Return markdown image syntax with marp options.
 
     Args:
-        url (str): image url (only online images)
-        align (str, optional): image alignment (left, right, center)
-        height (str, optional): image height (ex:"2in")
-        size (str, optional): cover, contain, auto, fix, x%
-        setAsBackground (bool, optional): set image as background
-    Returns:
-        _type_: _description_
-    """
+        url (str): Image url (only online images).
+        align (str, optional): Image alignment (left, right, center).
+        height (str, optional): Image height (ex:"2in").
+        size (str, optional): Cover, contain, auto, fix, x%.
+        setAsBackground (bool, optional): Set image as background.
 
+    Returns:
+        str: Markdown image syntax with marp options.
+    """
     options = ""
     if align is not None:
         options += f"{align}"

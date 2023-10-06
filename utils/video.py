@@ -23,6 +23,13 @@ def Popen(cmd: list) -> str:
 
 class video:
     def __init__(self, id, path):
+        """
+        Initializes a video object with the given video id and path.
+
+        Args:
+            id (str): The video id.
+            path (str): The path to save the video.
+        """
         self.path = path
         self.url = "https://youtu.be/" + id
         self.video_id = id
@@ -32,6 +39,9 @@ class video:
             os.mkdir(self.path.split("/")[-1])
 
     def download(self):
+        """
+        Downloads the video from the given url and saves it to the specified path.
+        """
         if os.path.exists(f"{self.path}.webm"):
             info(f"{self.path}.webm already exists, skipping download")
             return
@@ -44,6 +54,13 @@ class video:
         os.system(f"yt-dlp {self.url} -o {self.path}")
 
     def getframe(self, timestamp, out=os.curdir):
+        """
+        Extracts a frame from the video at the given timestamp and saves it to the specified path.
+
+        Args:
+            timestamp (str): The timestamp of the frame to extract.
+            out (str, optional): The path to save the extracted frame. Defaults to os.curdir.
+        """
         filename = out
         if os.path.exists(filename):
             info(f"{filename} already exists, skipping frame")
@@ -65,6 +82,12 @@ class video:
         )
 
     def getAudio(self, out="out.mp3"):
+        """
+        Extracts the audio from the video and saves it to the specified path.
+
+        Args:
+            out (str, optional): The path to save the extracted audio. Defaults to "out.mp3".
+        """
         info("Getting audio...")
         (
             Popen(
@@ -84,23 +107,25 @@ class video:
         )
 
     def getChapters(self, endpoint: str) -> list:
-        """return the chapters of the video
+        """
+        Returns the chapters of the video.
 
         Args:
-            endpoint (str): endpoint to communicate to get chapters
-                            yt.lemnoslife.com recommended
+            endpoint (str): The endpoint to communicate to get chapters. yt.lemnoslife.com recommended.
+
         Returns:
-            list: chapters
+            list: The chapters of the video.
         """
         res = requests.get(f"{endpoint}")
         chapters = res.json()['items'][0]['chapters']['chapters']
         return chapters
 
     def getSubtitles(self):
-        """return the raw subtitles
+        """
+        Returns the raw subtitles directly from youtube.
 
         Returns:
-            list: subtitles directly from youtube
+            list: The subtitles directly from youtube.
         """
         return json.loads(
             json.dumps(

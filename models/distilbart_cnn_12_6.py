@@ -36,6 +36,15 @@ def summarize(text, max_len=20):
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 def summarizePipeline(text):
+    """
+    Summarizes the given text using the DistilBART-CNN-12-6 model.
+    
+    Args:
+    text (str): The text to be summarized.
+    
+    Returns:
+    str: The summarized text.
+    """
     from transformers import pipeline
     
     pipe = pipeline(
@@ -47,15 +56,40 @@ def summarizePipeline(text):
     return pipe(text)[0]["summary_text"]
 
 class templates:
+    """
+    A class containing static methods for text summarization and a model function.
+    """
     def __init__(self):
         pass
     
     @staticmethod
     def ChunkSummarizer(text):
+        """
+        Summarizes the given text using the summarize function.
+        
+        Args:
+        text (str): The text to be summarized.
+        
+        Returns:
+        str: The summarized text.
+        """
         return summarize(text)
     
     @staticmethod
     def ChunkTitle(text, ovveride):
+        """
+        Summarizes the given text if ovveride is True, else raises an exception.
+        
+        Args:
+        text (str): The text to be summarized.
+        ovveride (bool): A flag to indicate whether to override the model's training and summarize the text.
+        
+        Returns:
+        str: The summarized text.
+        
+        Raises:
+        Exception: If ovveride is False.
+        """
         if ovveride:
             return summarize(text)
         else:
@@ -63,4 +97,10 @@ class templates:
     
     @staticmethod
     def model():
+        """
+        Returns the summarize function.
+        
+        Returns:
+        function: The summarize function.
+        """
         return summarize
