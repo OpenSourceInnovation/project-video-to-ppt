@@ -28,6 +28,8 @@ A project to experiment with LLM's generate simple presentation from videos.
 > **TITLE GENERATION** - Generates title for the video
 > **SUMMARY V2** - Generates summary of the video with more context. ( COSTLY/unoptimized )
 > **QA CHAT** - A chatbot interface using vecorstores to quickly search for the related data and fed to the LLM's to generate the answer for the question.
+>
+> Checkout docstrings for more info
 
 ## Installation
 
