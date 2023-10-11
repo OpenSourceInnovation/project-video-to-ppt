@@ -1,18 +1,35 @@
+<div align="center">
+
 # Project `Video to PPT`
 
-A project to experiment with LLM's generate to do tasks like
+A project to experiment with LLM's generate simple presentation from videos.
 
-- slide creation
-- Question Answer chatbot interface
-- Diagram Generation
+<a href="https://huggingface.co/spaces/zman1x1/yt-video-to-summary">
 
-## Getting Started
+<img src="https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-sm.svg">
 
-Project uses both Local LLM's and GPT 3.5 turbo api to generate the text from the target
+</a>
 
-> Its suggested to have a GPU for the project to run smoothly when using local LLMS
+</div>
 
-### Installation
+---
+
+## Models
+
+| Models | Templates |
+|-|-|
+| [OPENAI/gpt-3.5-turbo](https://platform.openai.com/docs/models/gpt-3-5)| `SUMMARY`, `TITLE GENERATION`, `SUMMARY V2` |
+| [MBZUAI/LaMini-Flan-T5-248M](https://huggingface.co/MBZUAI/LaMini-Flan-T5-248M) | `SUMMARY`, `TITLE GENERATION`, `QA CHAT` |
+| [google/flan-t5-large](https://huggingface.co/google/flan-t5-large) | `SUMMARY`, `TITLE GENERATION` |
+| [sshleifer/distilbart-cnn-12-6](https://huggingface.co/sshleifer/distilbart-cnn-12-6) | `SUMMARY` |
+|[fabiochiu/t5-small-medium-title-generation](https://huggingface.co/fabiochiu/t5-small-medium-title-generation) | `TITLE GENERATION` |
+
+> **SUMMARY** - Generates summary of the video
+> **TITLE GENERATION** - Generates title for the video
+> **SUMMARY V2** - Generates summary of the video with more context. ( COSTLY/unoptimized )
+> **QA CHAT** - A chatbot interface using vecorstores to quickly search for the related data and fed to the LLM's to generate the answer for the question.
+
+## Installation
 
 ```bash
 apt install git -y
@@ -21,37 +38,12 @@ cd project-video-to-ppt
 pip install -r requirements.txt
 ```
 
-### Usage
+## Usage
 
 For basic command line usage to generate PPT
 
 ```bash
 python3 main.py -v <video_id> --no-chapers
-```
-
-- `-v <video_id>` youtube video id ( in `https://youtu.be/PPZ0dQEIrTk?si=pRlTVjfTIzwqvChS` **PPZ0dQEIrTk** is the video id)
-- `--no-chapters` is recommended cause not all videos have chapters
-
-More options:
-
-```cmd
-usage: video to ppt (dev) [-h] [-v VIDEO_ID] [--chunk-size CHUNK_SIZE] [-o OUT_PPT_NAME] [--no-images] [--no-chapters] [--questions-mode]
-                          [--gui-web] [--use-model TARGET_MODEL]
-
-Convert Youtube videos to PPT/pdf with large language models
-
-options:
-  -h, --help            show this help message and exit
-  -v VIDEO_ID, --video VIDEO_ID
-                        YouTube video ID
-  --chunk-size CHUNK_SIZE
-  -o OUT_PPT_NAME, --out OUT_PPT_NAME
-  --no-images
-  --no-chapters
-  --questions-mode
-  --gui-web
-  --use-model TARGET_MODEL
-                        Set model to use (gpt3, lamini, bart) default: lamini
 ```
 
 ## GUI interfaces
